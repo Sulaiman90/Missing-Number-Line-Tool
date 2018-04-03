@@ -19,7 +19,8 @@
 		var SCROLL_TRACK_ENDING_POINT = 685.75;
 		var scrollTrackUnit;
 
-		var scaleStartingNo = 0;
+		var scaleStartingValue = 0;
+		var scaleEndingValue = 0;
 		var intervalNo = 1;
 
 		var unitGap = [50,100]; // 0th value upto 3 digits & 1st value for more than 3 digits
@@ -29,6 +30,7 @@
 		var minDisplayUnits = 7;
 		var unitGapValue;
 		var scaleShowVal;
+		var intervalVal;
 		
 		function NumberLine(mc) {
 			mainMov=mc;
@@ -60,80 +62,90 @@
 			createScale();
 			
 			//trace("init:scrollTrackUnit " + scrollTrackUnit);
+			
+			// testing purpose
+			toolArea.findTxt_txt.addEventListener(KeyboardEvent.KEY_DOWN,handler);
+				
+			function handler(e:KeyboardEvent){
+				   // if the key is ENTER
+				if(e.charCode == 13){
+					// your code here
+					findNoBtnHandler(e);
+				}
+			}
 		}
 		
 		function findNoBtnHandler(e){
 			var findTxtNo =  Number(toolArea.findTxt_txt.text);
-			var maxScaleValue = (TOTAL_UNITS-1 * intervalNo) - minDisplayUnits;
-			var minScaleValue = minDisplayUnits;
+			var maxScaleValue = scaleEndingValue - minDisplayUnits;
+			var minScaleValue = scaleStartingValue + minDisplayUnits;
 			scaleShowVal = findTxtNo - minDisplayUnits;
-			trace("findNoBtnHandler:scaleShowVal,maxScaleValue " + scaleShowVal, minScaleValue, maxScaleValue);
+			trace("---------------");
+			trace("findNoBtnHandler:findTxtNo,minScaleValue,maxScaleValue " + findTxtNo, minScaleValue, maxScaleValue);
+			trace("findNoBtnHandler:scaleStartingValue,scaleEndingValue " + scaleStartingValue,scaleEndingValue);
 			
-			if (findTxtNo < minScaleValue){
-				scaleStartingNo = 0;
-				removeAddedChilds();
-				createScale();				
+			if (findTxtNo >= minScaleValue && findTxtNo <= maxScaleValue){
+				trace(" within scale ");	
 				
-				var intervalVal = findTxtNo - minDisplayUnits;
+				intervalVal = findTxtNo - minDisplayUnits - scaleStartingValue;
 				if (intervalVal <= 0){
 					intervalVal = 0;
 					toolArea.scrollFace.x = SCROLL_TRACK_STARTING_POINT;
 				}
 				else{
-					moveLineAndScrollFace(findTxtNo);
+					moveScrollFace(findTxtNo);
 				}
 				toolArea.lineMc.x = 0 - unitGapValue * (intervalVal);
 			}
-			
-			/*if (findTxtNo > maxScaleValue){
-				trace(" scaleShowVal exceeded");
-				scaleStartingNo = findTxtNo - 50;
+			else if (findTxtNo > maxScaleValue){
+				trace(" find value gone after");
+				scaleStartingValue = findTxtNo - 50;
 				removeAddedChilds();
 				createScale();				
-				moveLineAndScrollFace(findTxtNo);
+				moveScrollFace(findTxtNo);
 				toolArea.lineMc.x = 0 - unitGapValue * (50 - minDisplayUnits);
-				//trace("lineMc "+toolArea.lineMc.x)
 			}
-			else if (scaleShowVal > minScaleValue){
-				trace(" scaleShowVal within bound");
-				moveLineAndScrollFace(findTxtNo);
-				toolArea.lineMc.x = 0 - unitGapValue * (scaleShowVal);
-			}
-			else if (findTxtNo < 100){
-				trace(" scaleShowVal less than bound");
-				scaleStartingNo = 0;
+			else if (findTxtNo < minScaleValue){
 				removeAddedChilds();
-				createScale();				
-				
-				var intervalVal = findTxtNo - minDisplayUnits;
-				if (intervalVal <= 0){
-					intervalVal = 0;
-					toolArea.scrollFace.x = SCROLL_TRACK_STARTING_POINT;
-				}
+				var val = findTxtNo - 50;
+				trace(" find value gone before:val "+val);
+				if (val > 0){
+					scaleStartingValue = val;
+					createScale();			
+					toolArea.lineMc.x = 0 - unitGapValue * (50 - minDisplayUnits);
+					moveScrollFace(findTxtNo);
+				}	
 				else{
-					moveLineAndScrollFace(findTxtNo);
+					scaleStartingValue = 0;
+					createScale();		
+						
+					intervalVal = findTxtNo - minDisplayUnits - scaleStartingValue;
+					if (intervalVal <= 0){
+						intervalVal = 0;
+						toolArea.scrollFace.x = SCROLL_TRACK_STARTING_POINT;
+					}
+					else{
+						moveScrollFace(findTxtNo);
+					}
+					toolArea.lineMc.x = 0 - unitGapValue * (intervalVal);
 				}
-				toolArea.lineMc.x = 0 - unitGapValue * (intervalVal);
-			}*/
-	
+			}
 		}
 		
-		function moveLineAndScrollFace(_findTxtNo){
-
+		function moveScrollFace(_findTxtNo){
 			var findTxtNo = _findTxtNo;
-			var scaleNo = findTxtNo - scaleStartingNo;
+			var scaleNo = findTxtNo - scaleStartingValue;
 			var sliderXPos = (scaleNo+1) * scrollTrackUnit;
 			var finalScrollFaceX = SCROLL_TRACK_STARTING_POINT + sliderXPos;
-			//trace("findNoBtnHandler:findNo " + findTxtNo, scaleStartingNo, scaleNo, sliderXPos, finalScrollFaceX);
+			//trace("findNoBtnHandler:findNo " + findTxtNo, scaleStartingValue, scaleNo, sliderXPos, finalScrollFaceX);
 			toolArea.scrollFace.x = finalScrollFaceX + 1;
 		}
 
 		function createBtnHandler(e){
-			scaleStartingNo = Number(toolArea.startNo_txt.text);
+			scaleStartingValue = Number(toolArea.startNo_txt.text);
 			intervalNo = Number(toolArea.interval_txt.text);
 			
 			removeAddedChilds();
-
 			createScale();
 
 			toolArea.startNo_txt.mouseEnabled = false;
@@ -142,13 +154,12 @@
 			enableButton(toolArea.reset_btn);
 		}
 
-
 		function createScale(){
 			var startingPointX = 13.05;
 			var startingPointY = 19;
 			var scrollSpeedValue;
 
-			if(scaleStartingNo < 1000){
+			if(scaleStartingValue < 1000){
 				unitGapValue = unitGap[0];	
 				scrollSpeedValue = scrollSpeed[0];
 			}
@@ -161,7 +172,6 @@
 			var scaleEndPos = startingPointX + totalScaleWidth;
 
 			//trace("startingPoint "+startingPointX,startingPointY);
-			//trace("totalScaleWidth "+totalScaleWidth);
 
 			toolArea.lineMc.rightArrow.x = scaleEndPos;
 
@@ -181,13 +191,18 @@
 				toolArea.lineMc.addChild(unitLineMC);
 				unitLineMC.y = startingPointY;
 				unitLineMC.x = startingPointX + SCALE_LEFT_RIGHT_PADDING + (i * unitGapValue);
-				unitLineMC.no_txt.text = scaleStartingNo + (i * intervalNo) ;
+				unitLineMC.no_txt.text = scaleStartingValue + (i * intervalNo) ;
+				scaleEndingValue = scaleStartingValue + (i * intervalNo);
 			}
 			
 			//trace("toolArea.lineMc " + toolArea.lineMc.width);
 			
 			slider = new CustomScrollPane(mainMov.parent,toolArea.lineMc, toolArea.scrollTrack, 
 					toolArea.scrollFace, toolArea.btnLeft, toolArea.btnRight, scrollSpeedValue , MASK_WIDTH) ;
+					
+			toolArea.txt1.text = scaleStartingValue;
+			toolArea.txt2.text = scaleEndingValue;
+			// added for testing purpose only
 		}
 
 		function removeAddedChilds(){
