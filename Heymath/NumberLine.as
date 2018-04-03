@@ -27,10 +27,14 @@
 		var scrollSpeed = [30,60];
 
 		var slider;
-		var minDisplayUnits = 7;
+		
+		var minDisplayUnitsAr = [7, 4];
+		var minDisplayUnits = minDisplayUnitsAr[0];
+		
 		var unitGapValue;
 		var scaleShowVal;
 		var intervalVal;
+		var fourDigitNoEntered = false;
 		
 		function NumberLine(mc) {
 			mainMov=mc;
@@ -77,6 +81,16 @@
 		
 		function findNoBtnHandler(e){
 			var findTxtNo =  Number(toolArea.findTxt_txt.text);
+			
+			if (findTxtNo + 50 >= 1000){
+				fourDigitNoEntered = true;
+				minDisplayUnits = minDisplayUnitsAr[1];
+			}
+			else{
+				fourDigitNoEntered = false;
+				minDisplayUnits = minDisplayUnitsAr[0];
+			}
+			
 			var maxScaleValue = scaleEndingValue - minDisplayUnits;
 			var minScaleValue = scaleStartingValue + minDisplayUnits;
 			scaleShowVal = findTxtNo - minDisplayUnits;
@@ -96,6 +110,10 @@
 					moveScrollFace(findTxtNo);
 				}
 				toolArea.lineMc.x = 0 - unitGapValue * (intervalVal);
+				
+				if (fourDigitNoEntered){
+					toolArea.lineMc.x = toolArea.lineMc.x -50;
+				}
 			}
 			else if (findTxtNo > maxScaleValue){
 				trace(" find value gone after");
@@ -104,6 +122,10 @@
 				createScale();				
 				moveScrollFace(findTxtNo);
 				toolArea.lineMc.x = 0 - unitGapValue * (50 - minDisplayUnits);
+				
+				if (fourDigitNoEntered){
+					toolArea.lineMc.x = toolArea.lineMc.x -50;
+				}
 			}
 			else if (findTxtNo < minScaleValue){
 				removeAddedChilds();
@@ -113,6 +135,10 @@
 					scaleStartingValue = val;
 					createScale();			
 					toolArea.lineMc.x = 0 - unitGapValue * (50 - minDisplayUnits);
+					
+					if (fourDigitNoEntered){
+						toolArea.lineMc.x = toolArea.lineMc.x -50;
+					}
 					moveScrollFace(findTxtNo);
 				}	
 				else{
@@ -158,8 +184,10 @@
 			var startingPointX = 13.05;
 			var startingPointY = 19;
 			var scrollSpeedValue;
+			
+			scaleEndingValue = scaleStartingValue + (TOTAL_UNITS * intervalNo);
 
-			if(scaleStartingValue < 1000){
+			if(scaleEndingValue < 1000){
 				unitGapValue = unitGap[0];	
 				scrollSpeedValue = scrollSpeed[0];
 			}
@@ -192,7 +220,6 @@
 				unitLineMC.y = startingPointY;
 				unitLineMC.x = startingPointX + SCALE_LEFT_RIGHT_PADDING + (i * unitGapValue);
 				unitLineMC.no_txt.text = scaleStartingValue + (i * intervalNo) ;
-				scaleEndingValue = scaleStartingValue + (i * intervalNo);
 			}
 			
 			//trace("toolArea.lineMc " + toolArea.lineMc.width);
