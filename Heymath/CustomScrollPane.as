@@ -5,8 +5,8 @@
 
 	public class  CustomScrollPane extends MovieClip{
 
-		var contentMain,scrollWidth,contentWidth,scrollFaceWidth;
-		var maskWidth,maskX,initPosition,initContentPos,finalContentPos;
+		var contentMain,scrollTrackWidth,contentWidth,scrollFaceWidth;
+		var maskWidth,maskX,scrollFaceInitPos,initContentPos,finalContentPos;
 
 		var scrollTrack,scrollFace;
 		var btnLeft,btnRight;
@@ -35,21 +35,21 @@
 
 		public function initSlider(){
 			contentMain.x = 0;
-			scrollWidth = scrollTrack.width;
+			scrollTrackWidth = scrollTrack.width;
 			contentWidth = contentMain.width;
 			scrollFaceWidth = scrollFace.width;
 			maskX = 0;
-			initPosition = scrollFace.x = scrollTrack.x;
+			scrollFaceInitPos = scrollFace.x = scrollTrack.x;
 			initContentPos = contentMain.x;
 			finalContentPos = maskWidth-contentWidth+initContentPos;
 
-			moveVal = (contentWidth-maskWidth)/(scrollWidth-scrollFaceWidth);
+			moveVal = (contentWidth-maskWidth)/(scrollTrackWidth-scrollFaceWidth);
 
 			xx = scrollTrack.x;
 			yy = scrollTrack.y;
 			ww = scrollTrack.width - scrollFaceWidth;
 			
-			//trace("speed "+speed);
+			trace("moveVal "+moveVal);
 
 			rectangle = new Rectangle(xx,yy,ww,0);
 	
@@ -84,13 +84,11 @@
 		function moveContent(e) {
 			//trace("moveContent ");
 			if(sliderState=="mouseMove"){
-				var dy = Math.abs(initPosition- scrollFace.x);
+				var dy = Math.abs(scrollFaceInitPos - scrollFace.x);
+				//moveVal = (contentWidth-maskWidth)/(scrollTrackWidth-scrollFaceWidth);
 				var posX = Math.round(dy*-1*moveVal+initContentPos);
 				//trace("moveContent:scrollFace:X "+scrollFace.x +" posX "+posX);
 				contentMain.x = posX;
-				if(scrollFace.x <= xx){
-					contentMain.x = initContentPos;
-				}
 			}
 			else if(sliderState=="left"){
 				if (contentMain.x + speed < maskX) {
@@ -129,10 +127,16 @@
 				}
 				//trace("right scroll "+scrollFace.x,contentMain.x);
 			}
+			if(scrollFace.x <= xx){
+				contentMain.x = initContentPos;
+			}
+			else if(scrollFace.x >= ww){
+				contentMain.x = contentMain.x + 6;
+			}
 		};
 
 		function scrollFaceUp(e) {
-			//trace("scrollFaceUp "+scrollFace.x);
+			trace("scrollFaceUp "+scrollFace.x,contentMain.x);
 			currentMov.stopDrag();
 			stageRef.removeEventListener(MouseEvent.MOUSE_UP,scrollFaceUp);
 			stageRef.removeEventListener(Event.ENTER_FRAME,moveContent);
