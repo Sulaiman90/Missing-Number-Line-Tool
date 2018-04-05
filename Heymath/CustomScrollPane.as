@@ -80,6 +80,8 @@
 			stageRef.addEventListener(Event.ENTER_FRAME,moveContent);
 			stageRef.addEventListener(MouseEvent.MOUSE_UP,scrollFaceUp);
 		}
+		
+
 
 		function moveContent(e) {
 			//trace("moveContent ");

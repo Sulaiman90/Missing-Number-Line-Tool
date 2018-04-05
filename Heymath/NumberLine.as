@@ -15,8 +15,10 @@
 		var TOTAL_UNITS = 101;
 		var MASK_WIDTH = 800;
 		var FADE_VALUE = 0.6;
-		var SCROLL_TRACK_STARTING_POINT = 20.30;
-		var SCROLL_TRACK_ENDING_POINT = 685.75;
+		var SCROLL_FACE_STARTING_POINT = 20;
+		var SCROLL_FACE_ENDING_POINT = 696;
+		
+		var STAGE_WIDTH = 800;
 		
 		var SCALE_STARTING_POS_X = 0;
 		var SCALE_STARTING_POS_Y = 19;
@@ -25,7 +27,7 @@
 
 		var scaleStartingValue = 0;
 		var scaleEndingValue = 0;
-		var intervalNo = 2;
+		var intervalNo = 1;
 
 		var unitGap = [50,100]; // 0th value upto 3 digits & 1st value for more than 3 digits
 		var scrollSpeed = [30,60];
@@ -76,10 +78,8 @@
 				}
 			}
 			
-			//scrollTrackUnit = (SCROLL_TRACK_ENDING_POINT - SCROLL_TRACK_STARTING_POINT) / TOTAL_UNITS;
-			
-			scrollTrackUnit = 7;
-			
+			scrollTrackUnit = STAGE_WIDTH / (TOTAL_UNITS - 1);
+		
 			trace("init:scrollTrackUnit " + scrollTrackUnit);
 
 			createScale();
@@ -126,10 +126,10 @@
 				
 				if (intervalVal < 0){
 					intervalVal = 0;
-					toolArea.scrollFace.x = SCROLL_TRACK_STARTING_POINT;
+					toolArea.scrollFace.x = SCROLL_FACE_STARTING_POINT;
 				}
 				else if (intervalVal == 0){
-					toolArea.scrollFace.x = SCROLL_TRACK_STARTING_POINT;
+					toolArea.scrollFace.x = SCROLL_FACE_STARTING_POINT;
 				}
 				else{
 					moveScrollFace(findTxtNo);
@@ -186,7 +186,7 @@
 					trace(" create scale again:val2,intervalVal "+val2,intervalVal);
 					if (intervalVal <= 0){
 						intervalVal = 0;
-						toolArea.scrollFace.x = SCROLL_TRACK_STARTING_POINT;
+						toolArea.scrollFace.x = SCROLL_FACE_STARTING_POINT;
 					}  
 					else{
 						moveScrollFace(findTxtNo);
@@ -207,12 +207,20 @@
 		
 		function moveScrollFace(_findTxtNo){
 			var findTxtNo = _findTxtNo;
-			trace("moveScrollFace--------------"+findTxtNo);
-			var scaleIntervalNo = (findTxtNo - scaleStartingValue - 0);
-			var sliderXPos = (scaleIntervalNo + 0) * scrollTrackUnit;
-			var finalScrollFaceX = SCROLL_TRACK_STARTING_POINT + sliderXPos;
-			trace("findNoBtnHandler:findNo " + findTxtNo, scaleIntervalNo, sliderXPos, finalScrollFaceX);
-			toolArea.scrollFace.x = sliderXPos ;
+			trace("moveScrollFace--------------"+findTxtNo,minDisplayUnits);
+			var scaleIntervalNo = Math.abs(findTxtNo - scaleStartingValue) / intervalNo;
+			var sliderXPos;
+			if (scaleIntervalNo >= (TOTAL_UNITS-1-minDisplayUnitsAr[0]) ){
+				toolArea.scrollFace.x = SCROLL_FACE_ENDING_POINT;
+			}
+			else{
+				sliderXPos = ((scaleIntervalNo + 0) * scrollTrackUnit) - (toolArea.scrollFace.width/2); 
+				toolArea.scrollFace.x = sliderXPos ;
+			}
+			trace("findNoBtnHandler:findNo " + findTxtNo, scaleIntervalNo, sliderXPos);
+			if (sliderXPos < SCROLL_FACE_STARTING_POINT){
+				toolArea.scrollFace.x = SCROLL_FACE_STARTING_POINT ;
+			}
 		}
 
 		function createBtnHandler(e){
