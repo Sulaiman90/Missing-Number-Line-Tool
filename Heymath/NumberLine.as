@@ -23,7 +23,7 @@
 		
 		var scrollTrackUnit;
 
-		var scaleStartingValue = 100;
+		var scaleStartingValue = 0;
 		var scaleEndingValue = 0;
 		var intervalNo = 2;
 
@@ -65,6 +65,17 @@
 			enableInputText(toolArea.interval_txt, 2);
 			enableInputText(toolArea.findTxt_txt, 5);
 			
+			toolArea.interval_txt.addEventListener("change", onTextChangeHandler);
+			
+			function onTextChangeHandler(e){
+				if (e.target.text=="") {
+					intervalNo = 1;
+				}
+				else{
+					intervalNo = Number(toolArea.interval_txt.text);
+				}
+			}
+			
 			//scrollTrackUnit = (SCROLL_TRACK_ENDING_POINT - SCROLL_TRACK_STARTING_POINT) / TOTAL_UNITS;
 			
 			scrollTrackUnit = 7;
@@ -97,8 +108,8 @@
 				minDisplayUnits = minDisplayUnitsAr[0];
 			}
 			
-			var minScaleValue = scaleStartingValue + minDisplayUnits;
-			var maxScaleValue = scaleEndingValue - minDisplayUnits - 1;
+			var minScaleValue = scaleStartingValue + (minDisplayUnits * intervalNo);
+			var maxScaleValue = scaleEndingValue - (minDisplayUnits * intervalNo)  - 1;
 
 			var scaleGapVal = Math.abs(scaleStartingValue - findTxtNo);
 			trace("---------------");
@@ -109,19 +120,25 @@
 								
 				intervalVal = ((findTxtNo - scaleStartingValue)/intervalNo) - minDisplayUnits ;
 				
-				trace(" within scale:intervalVal "+intervalVal);	
+				trace("within scale:intervalVal " + intervalVal);	
+				
+				// condition to check if scale value starts from beginning 
 				
 				if (intervalVal < 0){
 					intervalVal = 0;
+					toolArea.scrollFace.x = SCROLL_TRACK_STARTING_POINT;
+				}
+				else if (intervalVal == 0){
 					toolArea.scrollFace.x = SCROLL_TRACK_STARTING_POINT;
 				}
 				else{
 					moveScrollFace(findTxtNo);
 				}
 				
-				toolArea.lineMc.x = 0 - unitGapValue * (Math.abs(intervalVal));
+				toolArea.lineMc.x = 0 - unitGapValue * (intervalVal);
 				
 				if (intervalVal < 0 && scaleGapVal < minScaleValue){
+					trace("lessThanMinScale");
 					lessThanMinScale();
 				}
 				
@@ -129,7 +146,7 @@
 			}
 			else if (findTxtNo > maxScaleValue){
 				trace(" find value gone after");
-				scaleStartingValue = findTxtNo - 50;
+				scaleStartingValue = findTxtNo - (50 * intervalNo);
 				removeAddedChilds();
 				createScale();				
 				moveScrollFace(findTxtNo);
@@ -145,7 +162,7 @@
 			// find text no less than min scale value
 			function lessThanMinScale(){
 				removeAddedChilds();
-				var val = findTxtNo - scaleStartingValue - 50;
+				var val = findTxtNo - scaleStartingValue - (50 * intervalNo);
 				trace(" find value gone before:val "+val);
 				if (val > 0){
 					scaleStartingValue = val;
@@ -154,8 +171,8 @@
 					moveScrollFace(findTxtNo);
 				}	
 				else{
-					var val2 = findTxtNo - 50;
-					//trace(" create scale again:val2 "+val2);
+					var val2 = findTxtNo - (50 * intervalNo);
+					
 					if (val2 > minDisplayUnits){
 						scaleStartingValue = val2;
 					}
@@ -163,12 +180,14 @@
 						scaleStartingValue = 0;
 					}
 					createScale();		
-						
-					intervalVal = findTxtNo - minDisplayUnits - scaleStartingValue;
+					
+					intervalVal = ((findTxtNo - scaleStartingValue)/intervalNo) - minDisplayUnits ;
+					
+					trace(" create scale again:val2,intervalVal "+val2,intervalVal);
 					if (intervalVal <= 0){
 						intervalVal = 0;
 						toolArea.scrollFace.x = SCROLL_TRACK_STARTING_POINT;
-					}
+					}  
 					else{
 						moveScrollFace(findTxtNo);
 					}
@@ -187,8 +206,8 @@
 		}
 		
 		function moveScrollFace(_findTxtNo){
-			trace("moveScrollFace--------------");
 			var findTxtNo = _findTxtNo;
+			trace("moveScrollFace--------------"+findTxtNo);
 			var scaleIntervalNo = (findTxtNo - scaleStartingValue - 0);
 			var sliderXPos = (scaleIntervalNo + 0) * scrollTrackUnit;
 			var finalScrollFaceX = SCROLL_TRACK_STARTING_POINT + sliderXPos;
@@ -263,8 +282,8 @@
 			toolArea.txt2.text = scaleEndingValue - intervalNo;
 			// added for testing purpose only
 			
-			trace("createScale:minScaleValue,maxScaleValue " +  (scaleStartingValue+minDisplayUnits), 
-			(scaleEndingValue - minDisplayUnits - 1));
+			trace("createScale:minScaleValue,maxScaleValue " +  (scaleStartingValue+(minDisplayUnits*intervalNo)), 
+			(scaleEndingValue - (minDisplayUnits*intervalNo) - 1));
 		}
 
 		function removeAddedChilds(){

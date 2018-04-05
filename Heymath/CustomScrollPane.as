@@ -49,7 +49,7 @@
 			yy = scrollTrack.y;
 			ww = scrollTrack.width - scrollFaceWidth;
 			
-			trace("moveVal "+moveVal);
+			//trace("moveVal "+moveVal);
 
 			rectangle = new Rectangle(xx,yy,ww,0);
 	
