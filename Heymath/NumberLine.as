@@ -4,6 +4,7 @@
 	import flash.geom.*;
 	import flash.utils.*;
 	import flash.filters.*
+	import flash.text.*;
 	
 	public class NumberLine extends Main {
 		
@@ -11,7 +12,9 @@
 		private var toolArea;
 
 		var LINE_COLOR = 0x333333;
-		var SCALE_LEFT_RIGHT_PADDING = 37;
+		var GRAY_COLOR = 0xcccccc;
+		var BLACK_COLOR = 0x000000;
+		
 		var TOTAL_UNITS = 101;
 		var MASK_WIDTH = 800;
 		var FADE_VALUE = 0.6;
@@ -42,50 +45,24 @@
 		var intervalVal;
 		var fourDigitNoEntered = false;
 		
+		var textGrayColorFormat = new TextFormat();
+		var textBlackColorFormat = new TextFormat();
+		
 		function NumberLine(mc) {
 			mainMov=mc;
 			toolArea = mainMov.toolArea;
-			init();
+			initFun();
 			//trace("NumberLine");
 		}
 		
-		function init(){
+		function initFun(){
+			mainMov.toolArea.visible = false;
+			addEvents();
+
 			mainMov.intro.visible = false;
-
-			// toolArea - whole tool page
-
-			toolArea.startNo_txt.text = scaleStartingValue;
-			toolArea.interval_txt.text = intervalNo;
-
-			disableButton(toolArea.reset_btn);
-
-			toolArea.create_btn.addEventListener("click",createBtnHandler);
-			toolArea.reset_btn.addEventListener("click", resetBtnHandler);
-			toolArea.find_btn.addEventListener("click", findNoBtnHandler);
-
-			enableInputText(toolArea.startNo_txt, 5);
-			enableInputText(toolArea.interval_txt, 2);
-			enableInputText(toolArea.findTxt_txt, 5);
+			initScale();
 			
-			toolArea.interval_txt.addEventListener("change", onTextChangeHandler);
-			
-			function onTextChangeHandler(e){
-				if (e.target.text=="") {
-					intervalNo = 1;
-				}
-				else{
-					intervalNo = Number(toolArea.interval_txt.text);
-				}
-			}
-			
-			scrollTrackUnit = STAGE_WIDTH / (TOTAL_UNITS - 1);
-		
-			trace("init:scrollTrackUnit " + scrollTrackUnit);
-
-			createScale();
-			
-			// testing purpose
-			toolArea.findTxt_txt.addEventListener(KeyboardEvent.KEY_DOWN,handler);
+			toolArea.findTxt_txt.addEventListener(KeyboardEvent.KEY_DOWN,handler); 	// testing purpose
 				
 			function handler(e:KeyboardEvent){
 				   // if the key is ENTER
@@ -96,7 +73,33 @@
 			}
 		}
 		
+		function initScale(){
+			toolArea.startNo_txt.text = scaleStartingValue;
+			toolArea.interval_txt.text = intervalNo;
+			toolArea.findTxt_txt.text = 0;
+			
+			textGrayColorFormat.color = GRAY_COLOR;
+			textBlackColorFormat.color = BLACK_COLOR;
+			
+			disableButton(toolArea.reset_btn);
+			enableButton(toolArea.create_btn);
+			
+			enableText(toolArea.startNo_txt);
+			enableText(toolArea.interval_txt);
+			
+			enableInputText(toolArea.startNo_txt, 5);
+			enableInputText(toolArea.interval_txt, 2);
+			enableInputText(toolArea.findTxt_txt, 5);
+			
+			scrollTrackUnit = STAGE_WIDTH / (TOTAL_UNITS - 1);
+			
+			createScale();
+			
+			toolArea.visible = true;
+		}
+				
 		function findNoBtnHandler(e){
+			
 			var findTxtNo =  Number(toolArea.findTxt_txt.text) / 1;
 			
 			if (findTxtNo + 50 >= 1000){
@@ -148,7 +151,7 @@
 				trace(" find value gone after");
 				scaleStartingValue = findTxtNo - (50 * intervalNo);
 				removeAddedChilds();
-				createScale();				
+				createScale();	
 				moveScrollFace(findTxtNo);
 				toolArea.lineMc.x = 0 - unitGapValue * (50 - minDisplayUnits);
 				
@@ -158,6 +161,12 @@
 				lessThanMinScale();
 			}
 			toolArea.startNo_txt.text = scaleStartingValue;
+			if (toolArea.startNo_txt.mouseEnabled ){
+				toolArea.startNo_txt.setTextFormat(textBlackColorFormat);
+			}
+			else{
+				toolArea.startNo_txt.setTextFormat(textGrayColorFormat);
+			}
 			
 			// find text no less than min scale value
 			function lessThanMinScale(){
@@ -223,19 +232,6 @@
 			}
 		}
 
-		function createBtnHandler(e){
-			scaleStartingValue = Number(toolArea.startNo_txt.text);
-			intervalNo = Number(toolArea.interval_txt.text);
-			
-			removeAddedChilds();
-			createScale();
-
-			toolArea.startNo_txt.mouseEnabled = false;
-			toolArea.interval_txt.mouseEnabled = false;
-			disableButton(toolArea.create_btn);
-			enableButton(toolArea.reset_btn);
-		}
-
 		function createScale(){
 			var startingPointX = SCALE_STARTING_POS_X;
 			var startingPointY = SCALE_STARTING_POS_Y;
@@ -265,7 +261,7 @@
 			//trace("startingPoint "+startingPointX,startingPointY,scaleEndPos);
 
 			var lineShape = new Shape();
-			lineShape.graphics.lineStyle(5, LINE_COLOR, 1);
+			lineShape.graphics.lineStyle(2, LINE_COLOR, 1);
 			lineShape.graphics.moveTo(startingPointX,startingPointY);
 			lineShape.graphics.lineTo(scaleEndPos,startingPointY);
 			lineShape.name = "line";
@@ -293,7 +289,31 @@
 			trace("createScale:minScaleValue,maxScaleValue " +  (scaleStartingValue+(minDisplayUnits*intervalNo)), 
 			(scaleEndingValue - (minDisplayUnits*intervalNo) - 1));
 		}
-
+		
+		function resetScale(){
+			scaleStartingValue = 0;
+			intervalNo = 1;
+			removeAddedChilds();
+		}
+		
+		function addEvents(){
+			mainMov.intro.explore_btn.addEventListener("click", navigateBtnHandler);
+			toolArea.home_btn.addEventListener("click",navigateBtnHandler);
+			toolArea.create_btn.addEventListener("click",createBtnHandler);
+			toolArea.reset_btn.addEventListener("click", resetBtnHandler);
+			toolArea.find_btn.addEventListener("click", findNoBtnHandler);	
+			toolArea.interval_txt.addEventListener("change", onTextChangeHandler);
+		}
+		
+		function removeEvents(){
+			mainMov.intro.explore_btn.removeEventListener("click", navigateBtnHandler);
+			toolArea.home_btn.removeEventListener("click",navigateBtnHandler);
+			toolArea.create_btn.removeEventListener("click",createBtnHandler);
+			toolArea.reset_btn.removeEventListener("click", resetBtnHandler);
+			toolArea.find_btn.removeEventListener("click", findNoBtnHandler);	
+			toolArea.interval_txt.removeEventListener("change", onTextChangeHandler);
+		}
+		
 		function removeAddedChilds(){
 			for(var i=0; i<TOTAL_UNITS; i++){
 				var mc = toolArea.lineMc.getChildByName("unitLine"+i);
@@ -303,11 +323,50 @@
 			
 			slider.removeAllEvents();
 		}
+		
+		function createBtnHandler(e){
+			scaleStartingValue = Number(toolArea.startNo_txt.text);
+			intervalNo = Number(toolArea.interval_txt.text);
+			
+			removeAddedChilds();
+			createScale();
+
+			disableText(toolArea.startNo_txt);
+			disableText(toolArea.interval_txt);
+
+			disableButton(toolArea.create_btn);
+			enableButton(toolArea.reset_btn);
+		}
 
 		function resetBtnHandler(e){
-			toolArea.startNo_txt.mouseEnabled = true;
-			toolArea.interval_txt.mouseEnabled = true;
+			enableText(toolArea.startNo_txt);
+			enableText(toolArea.interval_txt);
+			
 			enableButton(toolArea.create_btn);
+			disableButton(toolArea.reset_btn);
+		}
+		
+		function navigateBtnHandler(e){
+			var name = e.currentTarget.name;
+			trace("navigateBtnHandler:name " + name);
+			if (name == "explore_btn"){
+				mainMov.intro.visible = false;
+				initScale();
+			}
+			else if (name == "home_btn"){
+				toolArea.visible = false;
+				resetScale();
+				mainMov.intro.visible = true;	
+			}
+		}
+		
+		function onTextChangeHandler(e){
+			if (e.target.text=="") {
+				intervalNo = 1;
+			}
+			else{
+				intervalNo = Number(toolArea.interval_txt.text);
+			}
 		}
 
 		function enableInputText(_refTxt, _maxChars){
@@ -341,6 +400,17 @@
 		function enableButton(btn){
 			btn.mouseEnabled = true;
 			btn.alpha = 1;
+		}
+		
+		function disableText(txt){
+			txt.mouseEnabled = false;
+			txt.setTextFormat(textGrayColorFormat);
+		}
+
+		function enableText(txt){
+			trace("enableText " + txt.name);
+			txt.mouseEnabled = true;
+			txt.setTextFormat(textBlackColorFormat);
 		}
 
 		

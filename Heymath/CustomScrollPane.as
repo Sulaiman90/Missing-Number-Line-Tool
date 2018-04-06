@@ -76,11 +76,15 @@
 			//trace("scrollFacePressed");
 			currentMov = e.currentTarget;
 			currentMov.startDrag(false, rectangle);
-			sliderState = "mouseMove";
-			stageRef.addEventListener(Event.ENTER_FRAME,moveContent);
+			currentMov.addEventListener(MouseEvent.MOUSE_MOVE, scrollFaceMoved);
 			stageRef.addEventListener(MouseEvent.MOUSE_UP,scrollFaceUp);
 		}
 		
+		function scrollFaceMoved(e){
+			//trace("scrollFaceMoved");
+			sliderState = "mouseMove";
+			stageRef.addEventListener(Event.ENTER_FRAME,moveContent);
+		}
 
 
 		function moveContent(e) {
@@ -132,8 +136,9 @@
 			if(scrollFace.x <= xx){
 				contentMain.x = initContentPos;
 			}
-			else if(scrollFace.x >= ww){
-				contentMain.x = contentMain.x + 6;
+			else if (scrollFace.x >= ww){
+				trace("scroll face limit reached");
+				contentMain.x = contentMain.x + 2;
 			}
 		};
 
@@ -141,7 +146,8 @@
 			trace("scrollFaceUp "+scrollFace.x,contentMain.x);
 			currentMov.stopDrag();
 			stageRef.removeEventListener(MouseEvent.MOUSE_UP,scrollFaceUp);
-			stageRef.removeEventListener(Event.ENTER_FRAME,moveContent);
+			stageRef.removeEventListener(Event.ENTER_FRAME, moveContent);
+			currentMov.removeEventListener(MouseEvent.MOUSE_MOVE, scrollFaceMoved);
 		}
 
 		function btnPress(e) {
