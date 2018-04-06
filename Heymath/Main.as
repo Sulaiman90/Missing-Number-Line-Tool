@@ -3,8 +3,16 @@
 	import flash.display.*;
 
 	public class Main extends MovieClip {
-
-
+		
+		public var stageMainRef1;
+		var numberLine;
+		
+		public function initMain(mc){
+			stageMainRef1 = mc;
+			//trace("1 " + stageMainRef1.name);
+			numberLine = new NumberLine(mc);	
+		}
+		
 		public function duplicateMovie(target,mov):DisplayObject {
 			//trace(target)
 			var duplicate:DisplayObject = new target();
@@ -32,6 +40,11 @@
 				narr.splice(rand,1);
 			}
 			return tempArr;
+		}
+		
+		public function logMsg(msg,_stageMainRef){
+			//trace(stageMainRef1.name,mc1.name,this.name);
+			_stageMainRef.logTxt.text = msg;
 		}
 
 	}

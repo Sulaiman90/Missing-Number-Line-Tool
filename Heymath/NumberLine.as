@@ -30,7 +30,7 @@
 
 		var scaleStartingValue = 0;
 		var scaleEndingValue = 0;
-		var intervalNo = 1;
+		var intervalNo = 3;
 
 		var unitGap = [50,100]; // 0th value upto 3 digits & 1st value for more than 3 digits
 		var scrollSpeed = [30,60];
@@ -81,6 +81,8 @@
 			textGrayColorFormat.color = GRAY_COLOR;
 			textBlackColorFormat.color = BLACK_COLOR;
 			
+			toolArea.scrollFace.x = SCROLL_FACE_STARTING_POINT;
+			
 			disableButton(toolArea.reset_btn);
 			enableButton(toolArea.create_btn);
 			
@@ -93,7 +95,7 @@
 			
 			scrollTrackUnit = STAGE_WIDTH / (TOTAL_UNITS - 1);
 			
-			createScale();
+			createScale(); // testing purpose
 			
 			toolArea.visible = true;
 		}
@@ -258,7 +260,11 @@
 			toolArea.lineMc.leftArrow.x = startingPointX;
 			toolArea.lineMc.rightArrow.x = scaleEndPos;
 
-			//trace("startingPoint "+startingPointX,startingPointY,scaleEndPos);
+			trace("startingPoint " + startingPointX, startingPointY, scaleEndPos);
+			
+			//var lineContainer = new MovieClip();
+			
+			//toolArea.lineMc.addChild(lineContainer);
 
 			var lineShape = new Shape();
 			lineShape.graphics.lineStyle(2, LINE_COLOR, 1);
@@ -275,12 +281,27 @@
 				unitLineMC.name = "unitLine"+i;
 				toolArea.lineMc.addChild(unitLineMC);
 				unitLineMC.y = startingPointY;
-				unitLineMC.x = startingPointX + 50 + (i * unitGapValue);
+				var scaleUnitPos = startingPointX + 50 + (i * unitGapValue);
+				unitLineMC.x = scaleUnitPos;
 				unitLineMC.no_txt.text = scaleStartingValue + (i * intervalNo) ;
+				
+				if (i < TOTAL_UNITS-1){
+					for (var j = 1 ; j < intervalNo; j++){
+						var intervalLineMC = new intervalLine();
+						intervalLineMC.name = "intervalLine"+j;
+						toolArea.lineMc.addChild(intervalLineMC);
+						intervalLineMC.y = startingPointY;
+						var intervalPos = Math.round(scaleUnitPos + ((unitGapValue / intervalNo) * j));
+						trace("j " + j,scaleUnitPos,intervalPos);
+						intervalLineMC.x = intervalPos;
+						 
+					}	
+				}	
 			}
 			
 			slider = new CustomScrollPane(mainMov.parent,toolArea.lineMc, toolArea.scrollTrack, 
 					toolArea.scrollFace, toolArea.btnLeft, toolArea.btnRight, scrollSpeedValue , MASK_WIDTH) ;
+				
 					
 			toolArea.txt1.text = scaleStartingValue;
 			toolArea.txt2.text = scaleEndingValue - intervalNo;
@@ -315,13 +336,17 @@
 		}
 		
 		function removeAddedChilds(){
-			for(var i=0; i<TOTAL_UNITS; i++){
-				var mc = toolArea.lineMc.getChildByName("unitLine"+i);
-				toolArea.lineMc.removeChild(mc);
+			try{
+				for(var i=0; i<TOTAL_UNITS; i++){
+					var mc = toolArea.lineMc.getChildByName("unitLine"+i);
+					toolArea.lineMc.removeChild(mc);
+				}
+				toolArea.lineMc.removeChild(toolArea.lineMc.getChildByName("line"));
+				slider.removeAllEvents();
 			}
-			toolArea.lineMc.removeChild(toolArea.lineMc.getChildByName("line"));
-			
-			slider.removeAllEvents();
+			catch (e){
+				
+			}	
 		}
 		
 		function createBtnHandler(e){

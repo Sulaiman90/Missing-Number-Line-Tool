@@ -3,7 +3,7 @@
 	import flash.events.*;
 	import flash.geom.Rectangle;
 
-	public class  CustomScrollPane extends MovieClip{
+	public class CustomScrollPane extends Main{
 
 		var contentMain,scrollTrackWidth,contentWidth,scrollFaceWidth;
 		var maskWidth,maskX,scrollFaceInitPos,initContentPos,finalContentPos;
@@ -18,6 +18,8 @@
 		var rectangle;
 		var stageRef;
 		var scrollFaceMaxPosX = 696;
+		
+		var rootStage;
 
 		public function CustomScrollPane(_stage,_contentMain,_scrollTrack,_scrollFace,_btnLeft,
 			_btnRight,_speed,_maskWidth){
@@ -30,6 +32,7 @@
 			speed = _speed;
 			stageRef = _stage;
 			maskWidth = _maskWidth;
+			rootStage = contentMain.parent.parent;
 			initSlider();
 		}
 
@@ -71,13 +74,12 @@
 			}
 		}
 
-			
 		function scrollFacePressed(e){
 			//trace("scrollFacePressed");
 			currentMov = e.currentTarget;
 			currentMov.startDrag(false, rectangle);
 			currentMov.addEventListener(MouseEvent.MOUSE_MOVE, scrollFaceMoved);
-			stageRef.addEventListener(MouseEvent.MOUSE_UP,scrollFaceUp);
+			currentMov.stage.addEventListener(MouseEvent.MOUSE_UP,scrollFaceUp);
 		}
 		
 		function scrollFaceMoved(e){
@@ -137,15 +139,16 @@
 				contentMain.x = initContentPos;
 			}
 			else if (scrollFace.x >= ww){
-				trace("scroll face limit reached");
+				//trace("scroll face limit reached");
 				contentMain.x = contentMain.x + 2;
 			}
 		};
 
 		function scrollFaceUp(e) {
-			trace("scrollFaceUp "+scrollFace.x,contentMain.x);
+			//trace("scrollFaceUp "+scrollFace.x,contentMain.x);
+			logMsg("scrollFaceUp",rootStage);
 			currentMov.stopDrag();
-			stageRef.removeEventListener(MouseEvent.MOUSE_UP,scrollFaceUp);
+			currentMov.stage.addEventListener(MouseEvent.MOUSE_UP,scrollFaceUp);
 			stageRef.removeEventListener(Event.ENTER_FRAME, moveContent);
 			currentMov.removeEventListener(MouseEvent.MOUSE_MOVE, scrollFaceMoved);
 		}
@@ -169,8 +172,14 @@
 		}
 		
 		public function removeAllEvents(){
-			scrollFace.removeEventListener(MouseEvent.MOUSE_DOWN,scrollFacePressed);
-			stageRef.removeEventListener(MouseEvent.MOUSE_UP,scrollFaceUp);
+			scrollFace.removeEventListener(MouseEvent.MOUSE_DOWN, scrollFacePressed);
+			try{
+				currentMov.stage.removeEventListener(MouseEvent.MOUSE_UP,scrollFaceUp);
+			}
+			catch (e){
+				
+			}
+			
 			btnLeft.removeEventListener(MouseEvent.MOUSE_DOWN,btnPress);
 			btnLeft.removeEventListener(MouseEvent.MOUSE_UP,btnRelease);
 			btnRight.removeEventListener(MouseEvent.MOUSE_DOWN,btnPress);
@@ -181,5 +190,6 @@
 		public function setSliderState(_sliderState){
 			sliderState = _sliderState;
 		}
+	
 	}
 }
