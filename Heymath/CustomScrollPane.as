@@ -52,7 +52,7 @@
 			yy = scrollTrack.y;
 			ww = scrollTrack.width - scrollFaceWidth;
 			
-			//trace("moveVal "+moveVal);
+			trace("moveVal "+moveVal,finalContentPos);
 
 			rectangle = new Rectangle(xx,yy,ww,0);
 	
@@ -116,9 +116,10 @@
 					stageRef.removeEventListener(Event.ENTER_FRAME,moveContent);
 				}
 			}
-			else if(sliderState=="right"){
+			else if (sliderState == "right"){
+				trace("right scroll:speed "+speed,scrollFace.x,scrollFaceMaxPosX,finalContentPos);
 				if (contentMain.x - speed > finalContentPos) {
-					//trace("right scroll:speed "+speed,moveVal,scrollFace.x);
+					trace("if ");
 					if (scrollFace.x >= scrollFaceMaxPosX) {
 						scrollFace.x = scrollFaceMaxPosX;
 					} 
@@ -126,9 +127,10 @@
 						scrollFace.x += speed/moveVal;
 					}
 					contentMain.x -= speed;
+					trace("contentMain "+contentMain.x);
 				} 
 				else {
-					//trace("no more right scroll");
+					trace("no more right scroll");
 					scrollFace.x = scrollFaceMaxPosX;
 					contentMain.x = finalContentPos;
 					stageRef.removeEventListener(Event.ENTER_FRAME,moveContent);
@@ -140,13 +142,13 @@
 			}
 			else if (scrollFace.x >= ww){
 				//trace("scroll face limit reached");
-				contentMain.x = contentMain.x + 2;
+				contentMain.x = finalContentPos;
 			}
 		};
 
 		function scrollFaceUp(e) {
-			//trace("scrollFaceUp "+scrollFace.x,contentMain.x);
-			logMsg("scrollFaceUp",rootStage);
+			trace("scrollFaceUp "+scrollFace.x,contentMain.x);
+			//MovieClip(root).logMsg("scrollFaceUp");
 			currentMov.stopDrag();
 			currentMov.stage.addEventListener(MouseEvent.MOUSE_UP,scrollFaceUp);
 			stageRef.removeEventListener(Event.ENTER_FRAME, moveContent);

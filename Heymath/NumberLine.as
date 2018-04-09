@@ -20,6 +20,7 @@
 		var FADE_VALUE = 0.6;
 		var SCROLL_FACE_STARTING_POINT = 20;
 		var SCROLL_FACE_ENDING_POINT = 696;
+		var SCALE_LEFT_RIGHT_PADDING = 50;
 		
 		var STAGE_WIDTH = 800;
 		
@@ -30,7 +31,7 @@
 
 		var scaleStartingValue = 0;
 		var scaleEndingValue = 0;
-		var intervalNo = 3;
+		var intervalNo = 6;
 
 		var unitGap = [50,100]; // 0th value upto 3 digits & 1st value for more than 3 digits
 		var scrollSpeed = [30,60];
@@ -243,10 +244,16 @@
 			
 			var totalScaleWidth;
 			
-			if(scaleEndingValue < 1000){
-				unitGapValue = unitGap[0];	
+			if (scaleEndingValue < 1000){
+				if (intervalNo < 6){
+					unitGapValue = unitGap[0];	
+				}
+				else{
+					unitGapValue = intervalNo * 10;
+				}	
 				scrollSpeedValue = scrollSpeed[0];
-				totalScaleWidth =  (unitGapValue * (TOTAL_UNITS + 1));
+				//trace("unitGapValue "+unitGapValue);
+				totalScaleWidth =  (unitGapValue * (TOTAL_UNITS-1) +  (SCALE_LEFT_RIGHT_PADDING * 2)) ;
 			}
 			else{
 				unitGapValue = unitGap[1];		
@@ -254,13 +261,13 @@
 				totalScaleWidth =  (unitGapValue * (TOTAL_UNITS));
 			}
 		
-			//trace("totalScaleWidth "+totalScaleWidth,unitGapValue,TOTAL_UNITS);
-			var scaleEndPos =  totalScaleWidth;
+			//trace("totalScaleWidth "+totalScaleWidth,unitGapValue,TOTAL_UNITS,(unitGapValue * (TOTAL_UNITS-1) +  SCALE_LEFT_RIGHT_PADDING));
+			var scaleEndPos =  SCALE_STARTING_POS_X + totalScaleWidth;
 			
 			toolArea.lineMc.leftArrow.x = startingPointX;
 			toolArea.lineMc.rightArrow.x = scaleEndPos;
 
-			trace("startingPoint " + startingPointX, startingPointY, scaleEndPos);
+			//trace("startingPoint " + startingPointX, startingPointY, scaleEndPos);
 			
 			var lineContainer = new MovieClip();
 			lineContainer.name = "lineContainer";
@@ -281,9 +288,11 @@
 				unitLineMC.name = "unitLine"+i;
 				lineContainer.addChild(unitLineMC);
 				unitLineMC.y = startingPointY;
-				var scaleUnitPos = startingPointX + 50 + (i * unitGapValue);
+				var scaleUnitPos = startingPointX + SCALE_LEFT_RIGHT_PADDING + (i * unitGapValue);
 				unitLineMC.x = scaleUnitPos;
-				unitLineMC.no_txt.text = scaleStartingValue + (i * intervalNo) ;
+				var txtStr = scaleStartingValue + (i * intervalNo) ;
+				unitLineMC.no_txt.text = txtStr;
+				//trace("i " + i, txtStr, scaleUnitPos);
 				
 				if (i < TOTAL_UNITS-1){
 					for (var j = 1 ; j < intervalNo; j++){
