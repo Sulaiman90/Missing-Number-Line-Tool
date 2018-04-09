@@ -262,9 +262,9 @@
 
 			trace("startingPoint " + startingPointX, startingPointY, scaleEndPos);
 			
-			//var lineContainer = new MovieClip();
-			
-			//toolArea.lineMc.addChild(lineContainer);
+			var lineContainer = new MovieClip();
+			lineContainer.name = "lineContainer";
+			toolArea.lineMc.addChild(lineContainer);
 
 			var lineShape = new Shape();
 			lineShape.graphics.lineStyle(2, LINE_COLOR, 1);
@@ -272,14 +272,14 @@
 			lineShape.graphics.lineTo(scaleEndPos,startingPointY);
 			lineShape.name = "line";
 
-			toolArea.lineMc.addChild(lineShape);
+			lineContainer.addChild(lineShape);
 			toolArea.lineMc.addChild(toolArea.lineMc.leftArrow);
 			toolArea.lineMc.addChild(toolArea.lineMc.rightArrow);
 
 			for(var i=0; i< TOTAL_UNITS ; i++){
 				var unitLineMC = new unitLine();
 				unitLineMC.name = "unitLine"+i;
-				toolArea.lineMc.addChild(unitLineMC);
+				lineContainer.addChild(unitLineMC);
 				unitLineMC.y = startingPointY;
 				var scaleUnitPos = startingPointX + 50 + (i * unitGapValue);
 				unitLineMC.x = scaleUnitPos;
@@ -289,10 +289,10 @@
 					for (var j = 1 ; j < intervalNo; j++){
 						var intervalLineMC = new intervalLine();
 						intervalLineMC.name = "intervalLine"+j;
-						toolArea.lineMc.addChild(intervalLineMC);
+						lineContainer.addChild(intervalLineMC);
 						intervalLineMC.y = startingPointY;
 						var intervalPos = Math.round(scaleUnitPos + ((unitGapValue / intervalNo) * j));
-						trace("j " + j,scaleUnitPos,intervalPos);
+						//trace("j " + j,scaleUnitPos,intervalPos);
 						intervalLineMC.x = intervalPos;
 						 
 					}	
@@ -335,18 +335,11 @@
 			toolArea.interval_txt.removeEventListener("change", onTextChangeHandler);
 		}
 		
-		function removeAddedChilds(){
-			try{
-				for(var i=0; i<TOTAL_UNITS; i++){
-					var mc = toolArea.lineMc.getChildByName("unitLine"+i);
-					toolArea.lineMc.removeChild(mc);
-				}
-				toolArea.lineMc.removeChild(toolArea.lineMc.getChildByName("line"));
-				slider.removeAllEvents();
-			}
-			catch (e){
-				
-			}	
+		function removeAddedChilds(){		
+			var lineContainerMc = toolArea.lineMc.getChildByName("lineContainer");
+			//trace("removeAddedChilds " + lineContainerMc.numChildren);
+			toolArea.lineMc.removeChild(lineContainerMc);
+			slider.removeAllEvents();
 		}
 		
 		function createBtnHandler(e){
