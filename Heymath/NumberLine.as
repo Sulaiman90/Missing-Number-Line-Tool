@@ -6,10 +6,10 @@
 	import flash.filters.*
 	import flash.text.*;
 	
-	public class NumberLine extends Main {
+	public class NumberLine extends Main{
 		
-		private var mainMov;
-		private var toolArea;
+		var mainMov;
+		var toolArea;
 
 		var LINE_COLOR = 0x333333;
 		var GRAY_COLOR = 0xcccccc;
@@ -31,12 +31,10 @@
 
 		var scaleStartingValue = 0;
 		var scaleEndingValue = 0;
-		var intervalNo = 1;
+		public var intervalNo = 1;
 
 		var unitGap = [50,100]; // 0th value upto 3 digits & 1st value for more than 3 digits
 		var scrollSpeed = [30,60];
-
-		var slider;
 		
 		var minDisplayUnitsAr = [7, 4];
 		var minDisplayUnits = minDisplayUnitsAr[0];
@@ -49,11 +47,18 @@
 		var textGrayColorFormat = new TextFormat();
 		var textBlackColorFormat = new TextFormat();
 		
-		function NumberLine(mc) {
+		var scaleDraw;
+		
+		public function NumberLine() {
+			trace("NumberLine ");
+		}
+		
+		public function initNumberLine(mc, _scaleDraw) {
+			trace("initNumberLine "+mc.name,mc.toolArea.name);
 			mainMov=mc;
 			toolArea = mainMov.toolArea;
+			scaleDraw = _scaleDraw;
 			initFun();
-			//trace("NumberLine");
 		}
 		
 		function initFun(){
@@ -72,6 +77,11 @@
 					findNoBtnHandler(e);
 				}
 			}
+		}
+		
+		function getIntervalNo(){
+			trace("intervalNo" + intervalNo);
+			return intervalNo;
 		}
 		
 		function initScale(){
@@ -194,7 +204,7 @@
 				trace(" find value gone after");
 				
 				scaleStartingValue = findTxtNo - (50 * intervalNo);
-				removeAddedChilds();
+				scaleDraw.removeAddedChilds();
 				createScale();	
 				moveScrollFace(findTxtNo);
 				toolArea.lineMc.x = 0 - unitGapValue * (50 - minDisplayUnits);
@@ -222,7 +232,7 @@
 			
 			// find text no less than min scale value
 			function lessThanMinScale(){
-				removeAddedChilds();
+				scaleDraw.removeAddedChilds();
 				var val = findTxtNo - scaleStartingValue - (50 * intervalNo);
 				var arrowXPos2;
 				trace(" find value gone before:val "+val);
@@ -237,16 +247,13 @@
 					
 					if (val2 > minDisplayUnits){
 						scaleStartingValue = val2;
-						trace("if");
-						//arrowXPos2 = SCALE_STARTING_POS_X + SCALE_LEFT_RIGHT_PADDING + (minDisplayUnits * unitGapValue);
+						//trace("if");
 						arrowXPos2 = ((findTxtNo - scaleStartingValue) / intervalNo ) * 8;		
 					}
 					else{
-						trace("else");
+						//trace("else");
 						scaleStartingValue = 0;
 						arrowXPos2 = ((findTxtNo - scaleStartingValue) / intervalNo ) * 8;			
-						//arrowXPos2 = SCALE_STARTING_POS_X + SCALE_LEFT_RIGHT_PADDING + ((findTxtNo / intervalNo) * unitGapValue);
-						// bug val 
 					}
 					createScale();		
 					
@@ -304,103 +311,20 @@
 			var findTxtNo = _findTxtNo;
 			var scaleIntervalNo = findTxtNo / intervalNo;
 			var arrowXPos = SCALE_STARTING_POS_X + SCALE_LEFT_RIGHT_PADDING + (scaleIntervalNo * unitGapValue);
-			trace("moveArrowMc:findTxtNo,scaleIntervalNo,arrowXPos " + findTxtNo,scaleIntervalNo,arrowXPos);
+			//trace("moveArrowMc:findTxtNo,scaleIntervalNo,arrowXPos " + findTxtNo,scaleIntervalNo,arrowXPos);
 			toolArea.arrowMc.x = arrowXPos;
 		}
 
 		function createScale(){
-			var startingPointX = SCALE_STARTING_POS_X;
-			var startingPointY = SCALE_STARTING_POS_Y;
-			var scrollSpeedValue;
-			
-			toolArea.arrowMc.x = 400;
-			
-			
-			scaleEndingValue =  scaleStartingValue + (TOTAL_UNITS * intervalNo) - intervalNo;
-			
-			var totalScaleWidth;
-			
-			if (scaleEndingValue < 1001){
-				if (intervalNo < 6){
-					unitGapValue = unitGap[0];	
-				}
-				else{
-					unitGapValue = intervalNo * 10;
-				}	
-				scrollSpeedValue = scrollSpeed[0];
-				//trace("unitGapValue "+unitGapValue);
-				totalScaleWidth =  (unitGapValue * (TOTAL_UNITS-1) +  (SCALE_LEFT_RIGHT_PADDING * 2)) ;
-			}
-			else{
-				unitGapValue = unitGap[1];		
-				scrollSpeedValue = scrollSpeed[1];
-				totalScaleWidth =  (unitGapValue * (TOTAL_UNITS));
-			}
-		
-			//trace("totalScaleWidth "+totalScaleWidth,unitGapValue,TOTAL_UNITS,(unitGapValue * (TOTAL_UNITS-1) +  SCALE_LEFT_RIGHT_PADDING));
-			var scaleEndPos =  SCALE_STARTING_POS_X + totalScaleWidth;
-			
-			toolArea.lineMc.leftArrow.x = startingPointX;
-			toolArea.lineMc.rightArrow.x = scaleEndPos;
-
-			//trace("startingPoint " + startingPointX, startingPointY, scaleEndPos,);
-			trace("scaleEndingValue " + scaleEndingValue);
-			
-			var lineContainer = new MovieClip();
-			lineContainer.name = "lineContainer";
-			toolArea.lineMc.addChild(lineContainer);
-
-			var lineShape = new Shape();
-			lineShape.graphics.lineStyle(2, LINE_COLOR, 1);
-			lineShape.graphics.moveTo(startingPointX,startingPointY);
-			lineShape.graphics.lineTo(scaleEndPos,startingPointY);
-			lineShape.name = "line";
-
-			lineContainer.addChild(lineShape);
-			toolArea.lineMc.addChild(toolArea.lineMc.leftArrow);
-			toolArea.lineMc.addChild(toolArea.lineMc.rightArrow);
-
-			for(var i=0; i< TOTAL_UNITS ; i++){
-				var unitLineMC = new unitLine();
-				unitLineMC.name = "unitLine"+i;
-				lineContainer.addChild(unitLineMC);
-				unitLineMC.y = startingPointY;
-				var scaleUnitPos = startingPointX + SCALE_LEFT_RIGHT_PADDING + (i * unitGapValue);
-				unitLineMC.x = scaleUnitPos;
-				var txtStr = scaleStartingValue + (i * intervalNo) ;
-				unitLineMC.no_txt.text = txtStr;
-				//trace("i " + i, txtStr, scaleUnitPos);
-				
-				if (i < TOTAL_UNITS-1){
-					for (var j = 1 ; j < intervalNo; j++){
-						var intervalLineMC = new intervalLine();
-						intervalLineMC.name = "intervalLine"+j;
-						lineContainer.addChild(intervalLineMC);
-						intervalLineMC.y = startingPointY;
-						var intervalPos = Math.round(scaleUnitPos + ((unitGapValue / intervalNo) * j));
-						//trace("j " + j,scaleUnitPos,intervalPos);
-						intervalLineMC.x = intervalPos;
-						 
-					}	
-				}	
-			}
-			
-			slider = new CustomScrollPane(mainMov.parent,toolArea.lineMc, toolArea.scrollTrack, 
-					toolArea.scrollFace, toolArea.btnLeft, toolArea.btnRight, scrollSpeedValue , MASK_WIDTH) ;
-				
-					
-			toolArea.txt1.text = scaleStartingValue;
-			toolArea.txt2.text = scaleEndingValue;
-			// added for testing purpose only
-			
-			trace("createScale:minScaleValue,maxScaleValue " +  (scaleStartingValue+(minDisplayUnits*intervalNo)), 
-			(scaleEndingValue - (minDisplayUnits*intervalNo) - 1));
+			trace("createScale:intervalNo " + intervalNo);
+			scaleDraw.generateScale();
+			trace("createScale2:intervalNo " + intervalNo);
 		}
 		
 		function resetScale(){
 			scaleStartingValue = 0;
 			intervalNo = 1;
-			removeAddedChilds();
+			scaleDraw.removeAddedChilds();
 			toolArea.arrowMc.visible = false;
 		}
 		
@@ -422,18 +346,13 @@
 			toolArea.interval_txt.removeEventListener("change", onTextChangeHandler);
 		}
 		
-		function removeAddedChilds(){		
-			var lineContainerMc = toolArea.lineMc.getChildByName("lineContainer");
-			//trace("removeAddedChilds " + lineContainerMc.numChildren);
-			toolArea.lineMc.removeChild(lineContainerMc);
-			slider.removeAllEvents();
-		}
+		
 		
 		function createBtnHandler(e){
 			scaleStartingValue = Number(toolArea.startNo_txt.text);
 			intervalNo = Number(toolArea.interval_txt.text);
 			
-			removeAddedChilds();
+			scaleDraw.removeAddedChilds();
 			createScale();
 
 			disableText(toolArea.startNo_txt);

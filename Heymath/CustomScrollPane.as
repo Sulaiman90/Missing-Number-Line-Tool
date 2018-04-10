@@ -3,7 +3,7 @@
 	import flash.events.*;
 	import flash.geom.Rectangle;
 
-	public class CustomScrollPane extends Main{
+	public class CustomScrollPane{
 
 		var contentMain,scrollTrackWidth,contentWidth,scrollFaceWidth;
 		var maskWidth,maskX,scrollFaceInitPos,initContentPos,finalContentPos;
@@ -23,7 +23,7 @@
 
 		public function CustomScrollPane(_stage,_contentMain,_scrollTrack,_scrollFace,_btnLeft,
 			_btnRight,_speed,_maskWidth){
-			//trace("CustomScrollPane");	
+			trace("CustomScrollPane ");	
 			contentMain = _contentMain;
 			scrollTrack = _scrollTrack;
 			scrollFace = _scrollFace;

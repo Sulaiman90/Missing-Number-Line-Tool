@@ -1,16 +1,14 @@
-﻿package Heymath{
-	import flash.geom.Point;
+﻿package Heymath {
 	import flash.display.*;
 
 	public class Main extends MovieClip {
 		
-		public var stageMainRef1;
-		var numberLine;
-		
+		var stageMainRef1;
+
 		public function initMain(mc){
-			stageMainRef1 = mc;
-			//trace("1 " + stageMainRef1.name);
-			numberLine = new NumberLine(mc);	
+			//trace("Main " + this);
+			var scaledraw = new ScaleDraw();
+			scaledraw.initScaleDraw(mc);
 		}
 		
 		public function duplicateMovie(target,mov):DisplayObject {
@@ -42,10 +40,10 @@
 			return tempArr;
 		}
 		
-		public function logMsg(msg,_stageMainRef){
+		/*public function logMsg(msg,_stageMainRef){
 			//trace(stageMainRef1.name,mc1.name,this.name);
-			_stageMainRef.logTxt.text = msg;
-		}
+			//_stageMainRef.logTxt.text = msg;
+		}*/
 
 	}
 }
