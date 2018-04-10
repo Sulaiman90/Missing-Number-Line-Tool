@@ -33,7 +33,7 @@
 		var scaleEndingValue = 0;
 		public var intervalNo = 1;
 
-		var unitGap = [50,100]; // 0th value upto 3 digits & 1st value for more than 3 digits
+		var unitGap = [60,100]; // 0th value upto 3 digits & 1st value for more than 3 digits
 		var scrollSpeed = [30,60];
 		
 		var minDisplayUnitsAr = [7, 4];
