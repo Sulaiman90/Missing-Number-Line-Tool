@@ -31,7 +31,7 @@
 
 		var scaleStartingValue = 0;
 		var scaleEndingValue = 0;
-		var intervalNo = 6;
+		var intervalNo = 1;
 
 		var unitGap = [50,100]; // 0th value upto 3 digits & 1st value for more than 3 digits
 		var scrollSpeed = [30,60];
@@ -99,28 +99,60 @@
 			createScale(); // testing purpose
 			
 			toolArea.visible = true;
+			
+			toolArea.arrowMc.visible = false;
 		}
 				
 		function findNoBtnHandler(e){
 			
+			toolArea.arrowMc.visible = true;
+			
 			var findTxtNo =  Number(toolArea.findTxt_txt.text) / 1;
 			
-			if (findTxtNo + 50 >= 1000){
+			var maxScaleNum = 0;
+			
+			/*if (findTxtNo > 50 && (findTxtNo > scaleEndingValue)){
+				scaleStartingValue = findTxtNo - (50 * intervalNo);
+				maxScaleNum = (findTxtNo - (50 * intervalNo)) * (TOTAL_UNITS * intervalNo);
+			}*/
+			
+			/*if (findTxtNo + 50 >= 1000 || maxScaleNum >= 1000){
 				fourDigitNoEntered = true;
 				minDisplayUnits = minDisplayUnitsAr[1];
 			}
 			else{
 				fourDigitNoEntered = false;
 				minDisplayUnits = minDisplayUnitsAr[0];
+				if (intervalNo > 5 && intervalNo < 10){
+					var dif = intervalNo - 5;
+					minDisplayUnits = minDisplayUnits - dif;
+				}
+			}*/
+			
+			if (findTxtNo + 50 >= 1000 ){
+				fourDigitNoEntered = true;
+				minDisplayUnits = minDisplayUnitsAr[1];
+			}
+			else{
+				fourDigitNoEntered = false;
+				minDisplayUnits = minDisplayUnitsAr[0];
+				if (intervalNo > 5 && intervalNo < 10){
+					var dif = intervalNo - 5;
+					minDisplayUnits = minDisplayUnits - dif;
+				}
 			}
 			
+			trace("fourDigitNoEntered " + fourDigitNoEntered,maxScaleNum,scaleEndingValue);
+						
 			var minScaleValue = scaleStartingValue + (minDisplayUnits * intervalNo);
-			var maxScaleValue = scaleEndingValue - (minDisplayUnits * intervalNo)  - 1;
+			var maxScaleValue = scaleEndingValue - ((minDisplayUnits * intervalNo)  );
 
 			var scaleGapVal = Math.abs(scaleStartingValue - findTxtNo);
-			trace("---------------");
+			trace("---------------minDisplayUnits "+minDisplayUnits);
 			trace("findNoBtnHandler:findTxtNo,minScaleValue,maxScaleValue " + findTxtNo, minScaleValue, maxScaleValue);
-			trace("findNoBtnHandler:scaleGapVal,scaleStartingValue,scaleEndingValue " + scaleGapVal,scaleStartingValue,scaleEndingValue);
+			trace("findNoBtnHandler:scaleGapVal,scaleStartingValue,scaleEndingValue " + scaleGapVal, scaleStartingValue, scaleEndingValue);
+			
+			var arrowXPos;
 			
 			if (findTxtNo >= minScaleValue && findTxtNo <= maxScaleValue){
 								
@@ -143,6 +175,14 @@
 				
 				toolArea.lineMc.x = 0 - unitGapValue * (intervalVal);
 				
+				arrowXPos = SCALE_STARTING_POS_X + SCALE_LEFT_RIGHT_PADDING + (minDisplayUnits * unitGapValue);
+				trace("findTxtNo,arrowXPos " + findTxtNo, arrowXPos);
+				
+				if (fourDigitNoEntered){
+					arrowXPos = arrowXPos-50;
+				}
+				toolArea.arrowMc.x = arrowXPos;
+				
 				if (intervalVal < 0 && scaleGapVal < minScaleValue){
 					trace("lessThanMinScale");
 					lessThanMinScale();
@@ -152,17 +192,26 @@
 			}
 			else if (findTxtNo > maxScaleValue){
 				trace(" find value gone after");
+				
 				scaleStartingValue = findTxtNo - (50 * intervalNo);
 				removeAddedChilds();
 				createScale();	
 				moveScrollFace(findTxtNo);
 				toolArea.lineMc.x = 0 - unitGapValue * (50 - minDisplayUnits);
 				
+				arrowXPos = SCALE_STARTING_POS_X + SCALE_LEFT_RIGHT_PADDING + (minDisplayUnits * unitGapValue);
+				trace("findTxtNo,arrowXPos " + findTxtNo,arrowXPos);
+				if (fourDigitNoEntered){
+					arrowXPos = arrowXPos-50;
+				}
+				toolArea.arrowMc.x = arrowXPos;
+				
 				checkScaleValue();
 			}
 			else if (scaleGapVal < minScaleValue){
 				lessThanMinScale();
 			}
+			
 			toolArea.startNo_txt.text = scaleStartingValue;
 			if (toolArea.startNo_txt.mouseEnabled ){
 				toolArea.startNo_txt.setTextFormat(textBlackColorFormat);
@@ -175,21 +224,29 @@
 			function lessThanMinScale(){
 				removeAddedChilds();
 				var val = findTxtNo - scaleStartingValue - (50 * intervalNo);
+				var arrowXPos2;
 				trace(" find value gone before:val "+val);
 				if (val > 0){
 					scaleStartingValue = val;
 					createScale();			
 					toolArea.lineMc.x = 0 - unitGapValue * (50 - minDisplayUnits);
-					moveScrollFace(findTxtNo);
+					moveScrollFace(findTxtNo);	
 				}	
 				else{
 					var val2 = findTxtNo - (50 * intervalNo);
 					
 					if (val2 > minDisplayUnits){
 						scaleStartingValue = val2;
+						trace("if");
+						//arrowXPos2 = SCALE_STARTING_POS_X + SCALE_LEFT_RIGHT_PADDING + (minDisplayUnits * unitGapValue);
+						arrowXPos2 = ((findTxtNo - scaleStartingValue) / intervalNo ) * 8;		
 					}
 					else{
+						trace("else");
 						scaleStartingValue = 0;
+						arrowXPos2 = ((findTxtNo - scaleStartingValue) / intervalNo ) * 8;			
+						//arrowXPos2 = SCALE_STARTING_POS_X + SCALE_LEFT_RIGHT_PADDING + ((findTxtNo / intervalNo) * unitGapValue);
+						// bug val 
 					}
 					createScale();		
 					
@@ -198,12 +255,18 @@
 					trace(" create scale again:val2,intervalVal "+val2,intervalVal);
 					if (intervalVal <= 0){
 						intervalVal = 0;
-						toolArea.scrollFace.x = SCROLL_FACE_STARTING_POINT;
+						toolArea.scrollFace.x = SCROLL_FACE_STARTING_POINT;			
 					}  
 					else{
 						moveScrollFace(findTxtNo);
 					}
-					toolArea.lineMc.x = 0 - unitGapValue * (intervalVal);
+					toolArea.lineMc.x = 0 - unitGapValue * (intervalVal);	
+					
+					if (fourDigitNoEntered){
+						arrowXPos2 = arrowXPos2-50;
+					}
+					trace("findTxtNo,arrowXPos2 " + findTxtNo,arrowXPos2);
+					toolArea.arrowMc.x = arrowXPos2;
 				}
 				checkScaleValue();
 			}
@@ -219,20 +282,30 @@
 		
 		function moveScrollFace(_findTxtNo){
 			var findTxtNo = _findTxtNo;
-			trace("moveScrollFace--------------"+findTxtNo,minDisplayUnits);
+			trace("moveScrollFace:findTxtNo" + findTxtNo);
+			//trace("moveScrollFace:minDisplayUnits"+minDisplayUnits);
 			var scaleIntervalNo = Math.abs(findTxtNo - scaleStartingValue) / intervalNo;
 			var sliderXPos;
 			if (scaleIntervalNo >= (TOTAL_UNITS-1-minDisplayUnitsAr[0]) ){
 				toolArea.scrollFace.x = SCROLL_FACE_ENDING_POINT;
 			}
 			else{
-				sliderXPos = ((scaleIntervalNo + 0) * scrollTrackUnit) - (toolArea.scrollFace.width/2); 
+				sliderXPos = (scaleIntervalNo * scrollTrackUnit) - (toolArea.scrollFace.width/2); 
 				toolArea.scrollFace.x = sliderXPos ;
 			}
-			trace("findNoBtnHandler:findNo " + findTxtNo, scaleIntervalNo, sliderXPos);
+			//trace("findNoBtnHandler:findNo " + findTxtNo, scaleIntervalNo, sliderXPos, (scaleIntervalNo * scrollTrackUnit) );
 			if (sliderXPos < SCROLL_FACE_STARTING_POINT){
 				toolArea.scrollFace.x = SCROLL_FACE_STARTING_POINT ;
 			}
+		}
+		
+		function moveArrowMc(_findTxtNo){
+			toolArea.arrowMc.visible = true;
+			var findTxtNo = _findTxtNo;
+			var scaleIntervalNo = findTxtNo / intervalNo;
+			var arrowXPos = SCALE_STARTING_POS_X + SCALE_LEFT_RIGHT_PADDING + (scaleIntervalNo * unitGapValue);
+			trace("moveArrowMc:findTxtNo,scaleIntervalNo,arrowXPos " + findTxtNo,scaleIntervalNo,arrowXPos);
+			toolArea.arrowMc.x = arrowXPos;
 		}
 
 		function createScale(){
@@ -240,11 +313,14 @@
 			var startingPointY = SCALE_STARTING_POS_Y;
 			var scrollSpeedValue;
 			
-			scaleEndingValue =  scaleStartingValue + (TOTAL_UNITS * intervalNo);
+			toolArea.arrowMc.x = 400;
+			
+			
+			scaleEndingValue =  scaleStartingValue + (TOTAL_UNITS * intervalNo) - intervalNo;
 			
 			var totalScaleWidth;
 			
-			if (scaleEndingValue < 1000){
+			if (scaleEndingValue < 1001){
 				if (intervalNo < 6){
 					unitGapValue = unitGap[0];	
 				}
@@ -267,7 +343,8 @@
 			toolArea.lineMc.leftArrow.x = startingPointX;
 			toolArea.lineMc.rightArrow.x = scaleEndPos;
 
-			//trace("startingPoint " + startingPointX, startingPointY, scaleEndPos);
+			//trace("startingPoint " + startingPointX, startingPointY, scaleEndPos,);
+			trace("scaleEndingValue " + scaleEndingValue);
 			
 			var lineContainer = new MovieClip();
 			lineContainer.name = "lineContainer";
@@ -313,7 +390,7 @@
 				
 					
 			toolArea.txt1.text = scaleStartingValue;
-			toolArea.txt2.text = scaleEndingValue - intervalNo;
+			toolArea.txt2.text = scaleEndingValue;
 			// added for testing purpose only
 			
 			trace("createScale:minScaleValue,maxScaleValue " +  (scaleStartingValue+(minDisplayUnits*intervalNo)), 
@@ -324,6 +401,7 @@
 			scaleStartingValue = 0;
 			intervalNo = 1;
 			removeAddedChilds();
+			toolArea.arrowMc.visible = false;
 		}
 		
 		function addEvents(){
@@ -363,6 +441,8 @@
 
 			disableButton(toolArea.create_btn);
 			enableButton(toolArea.reset_btn);
+			
+			toolArea.arrowMc.visible = false;
 		}
 
 		function resetBtnHandler(e){
@@ -435,7 +515,7 @@
 		}
 
 		function enableText(txt){
-			trace("enableText " + txt.name);
+			//trace("enableText " + txt.name);
 			txt.mouseEnabled = true;
 			txt.setTextFormat(textBlackColorFormat);
 		}
@@ -443,3 +523,6 @@
 		
 	}
 }
+
+
+

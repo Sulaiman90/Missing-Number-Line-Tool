@@ -147,7 +147,7 @@
 		};
 
 		function scrollFaceUp(e) {
-			trace("scrollFaceUp "+scrollFace.x,contentMain.x);
+			//trace("scrollFaceUp "+scrollFace.x,contentMain.x);
 			//MovieClip(root).logMsg("scrollFaceUp");
 			currentMov.stopDrag();
 			currentMov.stage.addEventListener(MouseEvent.MOUSE_UP,scrollFaceUp);
