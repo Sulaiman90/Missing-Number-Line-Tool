@@ -23,7 +23,7 @@
 
 		public function CustomScrollPane(_stage,_contentMain,_scrollTrack,_scrollFace,_btnLeft,
 			_btnRight,_speed,_maskWidth){
-			trace("CustomScrollPane ");	
+			//trace("CustomScrollPane ");	
 			contentMain = _contentMain;
 			scrollTrack = _scrollTrack;
 			scrollFace = _scrollFace;
@@ -52,7 +52,8 @@
 			yy = scrollTrack.y;
 			ww = scrollTrack.width - scrollFaceWidth;
 			
-			trace("moveVal "+moveVal,finalContentPos);
+			//trace("moveVal "+moveVal,finalContentPos);
+			trace("contentWidth "+contentWidth);
 
 			rectangle = new Rectangle(xx,yy,ww,0);
 	
@@ -147,7 +148,7 @@
 		};
 
 		function scrollFaceUp(e) {
-			//trace("scrollFaceUp "+scrollFace.x,contentMain.x);
+			trace("scrollFaceUp "+scrollFace.x,contentMain.x);
 			//MovieClip(root).logMsg("scrollFaceUp");
 			currentMov.stopDrag();
 			currentMov.stage.addEventListener(MouseEvent.MOUSE_UP,scrollFaceUp);

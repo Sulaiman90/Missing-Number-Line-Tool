@@ -30,28 +30,10 @@
 			
 			var scaleEndVal = scaleStartingValue + (TOTAL_UNITS * intervalNo) - intervalNo;
 			
+			// set scaleEndingValue
+			scaleEndingValue = scaleEndVal;
+			
 			//trace("intervalNo " + intervalNo,toolArea.name);
-
-			/*if (scaleEndVal < 1001)
-			   {
-			   if (intervalNo < 6)
-			   {
-			   unitGapValue = unitGap[0];
-			   }
-			   else
-			   {
-			   unitGapValue = intervalNo * 10;
-			   }
-			   scrollSpeedValue = scrollSpeed[0];
-			   //trace("unitGapValue "+unitGapValue);
-			   totalScaleWidth = (unitGapValue * (TOTAL_UNITS - 1) + (SCALE_LEFT_RIGHT_PADDING * 2));
-			   }
-			   else
-			   {
-			   unitGapValue = unitGap[1];
-			   scrollSpeedValue = scrollSpeed[1];
-			   totalScaleWidth = (unitGapValue * (TOTAL_UNITS));
-			   }*/
 			
 			if (intervalNo < 6)
 			{
@@ -59,7 +41,7 @@
 			}
 			else
 			{
-				unitGapValue = (intervalNo * 10) + 10;
+				unitGapValue = (intervalNo * 10) + (60 - 50); // change according to unitGapValue
 			}
 			scrollSpeedValue = scrollSpeed[0];
 			var totalScaleWidth = (unitGapValue * (TOTAL_UNITS - 1) + (SCALE_LEFT_RIGHT_PADDING * 2));	

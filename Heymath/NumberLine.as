@@ -29,9 +29,9 @@
 		
 		var scrollTrackUnit;
 
-		var scaleStartingValue = 0;
+		var scaleStartingValue = 100;
 		var scaleEndingValue = 0;
-		public var intervalNo = 1;
+		var intervalNo = 1;
 
 		var unitGap = [60,100]; // 0th value upto 3 digits & 1st value for more than 3 digits
 		var scrollSpeed = [30,60];
@@ -79,11 +79,6 @@
 			}
 		}
 		
-		function getIntervalNo(){
-			trace("intervalNo" + intervalNo);
-			return intervalNo;
-		}
-		
 		function initScale(){
 			toolArea.startNo_txt.text = scaleStartingValue;
 			toolArea.interval_txt.text = intervalNo;
@@ -117,27 +112,9 @@
 			
 			toolArea.arrowMc.visible = true;
 			
-			var findTxtNo =  Number(toolArea.findTxt_txt.text) / 1;
+			var findTxtNo =  Number(toolArea.findTxt_txt.text);
 			
 			var maxScaleNum = 0;
-			
-			/*if (findTxtNo > 50 && (findTxtNo > scaleEndingValue)){
-				scaleStartingValue = findTxtNo - (50 * intervalNo);
-				maxScaleNum = (findTxtNo - (50 * intervalNo)) * (TOTAL_UNITS * intervalNo);
-			}*/
-			
-			/*if (findTxtNo + 50 >= 1000 || maxScaleNum >= 1000){
-				fourDigitNoEntered = true;
-				minDisplayUnits = minDisplayUnitsAr[1];
-			}
-			else{
-				fourDigitNoEntered = false;
-				minDisplayUnits = minDisplayUnitsAr[0];
-				if (intervalNo > 5 && intervalNo < 10){
-					var dif = intervalNo - 5;
-					minDisplayUnits = minDisplayUnits - dif;
-				}
-			}*/
 			
 			if (findTxtNo + 50 >= 1000 ){
 				fourDigitNoEntered = true;
@@ -146,30 +123,37 @@
 			else{
 				fourDigitNoEntered = false;
 				minDisplayUnits = minDisplayUnitsAr[0];
-				if (intervalNo > 5 && intervalNo < 10){
+				/*if (intervalNo > 5 && intervalNo < 10){
 					var dif = intervalNo - 5;
 					minDisplayUnits = minDisplayUnits - dif;
-				}
+				}*/
 			}
 			
-			trace("fourDigitNoEntered " + fourDigitNoEntered,maxScaleNum,scaleEndingValue);
+			//trace("fourDigitNoEntered " + fourDigitNoEntered,maxScaleNum,scaleEndingValue);
 						
-			var minScaleValue = scaleStartingValue + (minDisplayUnits * intervalNo);
-			var maxScaleValue = scaleEndingValue - ((minDisplayUnits * intervalNo)  );
-
+			var minScaleValue = scaleStartingValue ;
+			var maxScaleValue = scaleEndingValue;
+			var minScaleLimit = scaleStartingValue + (minDisplayUnits * intervalNo);
+			var maxScaleLimit = scaleEndingValue - ((minDisplayUnits * intervalNo));
 			var scaleGapVal = Math.abs(scaleStartingValue - findTxtNo);
-			trace("---------------minDisplayUnits "+minDisplayUnits);
-			trace("findNoBtnHandler:findTxtNo,minScaleValue,maxScaleValue " + findTxtNo, minScaleValue, maxScaleValue);
-			trace("findNoBtnHandler:scaleGapVal,scaleStartingValue,scaleEndingValue " + scaleGapVal, scaleStartingValue, scaleEndingValue);
+			
+			trace("---------------");
+			trace("findTxtNo,minDisplayUnits "+findTxtNo,minDisplayUnits);
+			trace("findNoBtnHandler:minScaleValue: "+minScaleValue +" maxScaleValue: "+maxScaleValue);
+			trace("scaleGapVal,scaleStartingValue,scaleEndingValue " + scaleGapVal, scaleStartingValue, scaleEndingValue);
 			
 			var arrowXPos;
+			var lineScaleX;
+			var scaleIntervalNo;
 			
-			if (findTxtNo >= minScaleValue && findTxtNo <= maxScaleValue){
-								
-				intervalVal = ((findTxtNo - scaleStartingValue)/intervalNo) - minDisplayUnits ;
+			if (findTxtNo >= minScaleValue && findTxtNo <= maxScaleValue){				
+				if (findTxtNo > scaleStartingValue){
+					intervalVal = ((findTxtNo - scaleStartingValue)/intervalNo) - minDisplayUnits;
+				}
 				
-				trace("within scale:intervalVal " + intervalVal);	
-				
+				scaleIntervalNo = Math.abs(findTxtNo - scaleStartingValue) / intervalNo;				
+				trace("within scale:intervalVal " + intervalVal,scaleIntervalNo);	
+					
 				// condition to check if scale value starts from beginning 
 				
 				if (intervalVal < 0){
@@ -183,10 +167,17 @@
 					moveScrollFace(findTxtNo);
 				}
 				
-				toolArea.lineMc.x = 0 - unitGapValue * (intervalVal);
+				lineScaleX = 0 - ((scaleIntervalNo * unitGapValue) - (minDisplayUnits * 50));
+				toolArea.lineMc.x = lineScaleX;
 				
-				arrowXPos = SCALE_STARTING_POS_X + SCALE_LEFT_RIGHT_PADDING + (minDisplayUnits * unitGapValue);
-				trace("findTxtNo,arrowXPos " + findTxtNo, arrowXPos);
+				if (scaleIntervalNo > minDisplayUnits){
+					arrowXPos = 50 * 8;
+				}
+				else{
+					arrowXPos = SCALE_STARTING_POS_X + SCALE_LEFT_RIGHT_PADDING + (scaleIntervalNo * unitGapValue);
+				}
+			
+				trace("findTxtNo,arrowXPos " + findTxtNo, arrowXPos, lineScaleX);
 				
 				if (fourDigitNoEntered){
 					arrowXPos = arrowXPos-50;
@@ -196,21 +187,24 @@
 				if (intervalVal < 0 && scaleGapVal < minScaleValue){
 					trace("lessThanMinScale");
 					lessThanMinScale();
-				}
-				
+				}	
 				checkScaleValue();
 			}
-			else if (findTxtNo > maxScaleValue){
+			else if (findTxtNo > maxScaleLimit){
 				trace(" find value gone after");
 				
 				scaleStartingValue = findTxtNo - (50 * intervalNo);
 				scaleDraw.removeAddedChilds();
 				createScale();	
 				moveScrollFace(findTxtNo);
-				toolArea.lineMc.x = 0 - unitGapValue * (50 - minDisplayUnits);
 				
-				arrowXPos = SCALE_STARTING_POS_X + SCALE_LEFT_RIGHT_PADDING + (minDisplayUnits * unitGapValue);
-				trace("findTxtNo,arrowXPos " + findTxtNo,arrowXPos);
+				scaleIntervalNo = Math.abs(findTxtNo - scaleStartingValue) / intervalNo;
+				lineScaleX = 0 - ((scaleIntervalNo * unitGapValue) - (minDisplayUnits * 50));
+				toolArea.lineMc.x = lineScaleX;
+				//trace("lineScaleX,scaleIntervalNo " + lineScaleX, scaleIntervalNo,unitGapValue);
+					
+				arrowXPos = scaleIntervalNo * 8;
+				//trace("findTxtNo,arrowXPos " + findTxtNo,arrowXPos);
 				if (fourDigitNoEntered){
 					arrowXPos = arrowXPos-50;
 				}
@@ -289,7 +283,7 @@
 		
 		function moveScrollFace(_findTxtNo){
 			var findTxtNo = _findTxtNo;
-			trace("moveScrollFace:findTxtNo" + findTxtNo);
+			trace("moveScrollFace:findTxtNo " + findTxtNo);
 			//trace("moveScrollFace:minDisplayUnits"+minDisplayUnits);
 			var scaleIntervalNo = Math.abs(findTxtNo - scaleStartingValue) / intervalNo;
 			var sliderXPos;
@@ -316,9 +310,8 @@
 		}
 
 		function createScale(){
-			trace("createScale:intervalNo " + intervalNo);
+			//trace("createScale:intervalNo " + intervalNo);
 			scaleDraw.generateScale();
-			trace("createScale2:intervalNo " + intervalNo);
 		}
 		
 		function resetScale(){
