@@ -116,18 +116,18 @@
 			
 			var maxScaleNum = 0;
 			
-			if (findTxtNo + 50 >= 1000 ){
+			/*if (findTxtNo + 50 >= 1000 ){
 				fourDigitNoEntered = true;
 				minDisplayUnits = minDisplayUnitsAr[1];
 			}
 			else{
 				fourDigitNoEntered = false;
 				minDisplayUnits = minDisplayUnitsAr[0];
-				/*if (intervalNo > 5 && intervalNo < 10){
+				if (intervalNo > 5 && intervalNo < 10){
 					var dif = intervalNo - 5;
 					minDisplayUnits = minDisplayUnits - dif;
-				}*/
-			}
+				}
+			}*/
 			
 			//trace("fourDigitNoEntered " + fourDigitNoEntered,maxScaleNum,scaleEndingValue);
 						
@@ -139,8 +139,9 @@
 			
 			trace("---------------");
 			trace("findTxtNo,minDisplayUnits "+findTxtNo,minDisplayUnits);
-			trace("findNoBtnHandler:minScaleValue: "+minScaleValue +" maxScaleValue: "+maxScaleValue);
-			trace("scaleGapVal,scaleStartingValue,scaleEndingValue " + scaleGapVal, scaleStartingValue, scaleEndingValue);
+			trace(":minScaleValue: " + minScaleValue +" maxScaleValue: " + maxScaleValue);
+			trace(":minScaleLimit: " + minScaleLimit +" maxScaleLimit: " + maxScaleLimit);
+			trace(":scaleGapVal: "+scaleGapVal +" scaleStartingValue: "+scaleStartingValue+" scaleEndingValue: "+scaleEndingValue);
 			
 			var arrowXPos;
 			var lineScaleX;
@@ -149,13 +150,23 @@
 			if (findTxtNo >= minScaleValue && findTxtNo <= maxScaleValue){				
 				if (findTxtNo > scaleStartingValue){
 					intervalVal = ((findTxtNo - scaleStartingValue)/intervalNo) - minDisplayUnits;
-				}
-				
+				}			
+				// scale unit value
 				scaleIntervalNo = Math.abs(findTxtNo - scaleStartingValue) / intervalNo;				
-				trace("within scale:intervalVal " + intervalVal,scaleIntervalNo);	
-					
-				// condition to check if scale value starts from beginning 
+				trace("within scale:intervalVal " + intervalVal + " scaleIntervalNo "+ scaleIntervalNo);	
 				
+				if (findTxtNo >= minScaleLimit && findTxtNo <= maxScaleLimit){				
+					lineScaleX = 0 - ((scaleIntervalNo * unitGapValue) - (minDisplayUnits * 50));
+				}
+				else if (findTxtNo >= maxScaleLimit){
+					lineScaleX = 0 - (((TOTAL_UNITS-minDisplayUnits) * unitGapValue) - (minDisplayUnits * 50));
+				}
+				else if (findTxtNo <= minScaleLimit){
+					lineScaleX = 0;
+				}			
+				toolArea.lineMc.x = lineScaleX;		
+				
+				// move scroll face 	
 				if (intervalVal < 0){
 					intervalVal = 0;
 					toolArea.scrollFace.x = SCROLL_FACE_STARTING_POINT;
@@ -165,30 +176,41 @@
 				}
 				else{
 					moveScrollFace(findTxtNo);
-				}
+				}	
 				
-				lineScaleX = 0 - ((scaleIntervalNo * unitGapValue) - (minDisplayUnits * 50));
-				toolArea.lineMc.x = lineScaleX;
+				var findTxtMinLimit = minDisplayUnits;
+				var findTxtMaxLimit = TOTAL_UNITS-minDisplayUnits;
 				
-				if (scaleIntervalNo > minDisplayUnits){
+				// arrow x calculation 	
+				if (scaleIntervalNo >= findTxtMinLimit && (scaleIntervalNo <= findTxtMaxLimit)){
+					// > than minDisplayUnits, make it as center
 					arrowXPos = 50 * 8;
 				}
-				else{
+				else if (scaleIntervalNo < findTxtMinLimit){
+					// else move arrow
 					arrowXPos = SCALE_STARTING_POS_X + SCALE_LEFT_RIGHT_PADDING + (scaleIntervalNo * unitGapValue);
 				}
-			
-				trace("findTxtNo,arrowXPos " + findTxtNo, arrowXPos, lineScaleX);
-				
-				if (fourDigitNoEntered){
-					arrowXPos = arrowXPos-50;
+				else if (scaleIntervalNo > findTxtMaxLimit){
+					// else move arrow 
+					// find the difference between center and findtxt value
+					var val1 = 400 + ((scaleIntervalNo - (TOTAL_UNITS - minDisplayUnits)) * unitGapValue) ;
+					trace("val1 " + val1);
+					arrowXPos = val1;
 				}
 				toolArea.arrowMc.x = arrowXPos;
+			
+				trace("findTxtNo "+findTxtNo +" arrowXPos "+arrowXPos +" lineScaleX "+lineScaleX);
+				
+				/*if (fourDigitNoEntered){
+					arrowXPos = arrowXPos-50;
+				}
+					toolArea.arrowMc.x = arrowXPos;
 				
 				if (intervalVal < 0 && scaleGapVal < minScaleValue){
 					trace("lessThanMinScale");
 					lessThanMinScale();
 				}	
-				checkScaleValue();
+				checkScaleValue();*/
 			}
 			else if (findTxtNo > maxScaleLimit){
 				trace(" find value gone after");
