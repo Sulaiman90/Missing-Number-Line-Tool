@@ -145,7 +145,7 @@
 				//trace("scroll face limit reached");
 				contentMain.x = finalContentPos;
 			}
-		};
+		}
 
 		function scrollFaceUp(e) {
 			trace("scrollFaceUp "+scrollFace.x,contentMain.x);

@@ -33,7 +33,7 @@
 		
 		var scaleStartingValue = 100;
 		var scaleEndingValue = 0;
-		var intervalNo = 3;
+		var intervalNo = 2;
 		
 		var unitGap = [60, 100]; // 0th value upto 3 digits & 1st value for more than 3 digits
 		var scrollSpeed = [30, 60];
@@ -45,11 +45,14 @@
 		var scaleShowVal;
 		var intervalVal;
 		var fourDigitNoEntered = false;
+		var displayUnits = 0; // max total units can visible in screen
+		var visibleUnits = 0; // units visible in screen
 		
 		var textGrayColorFormat = new TextFormat();
 		var textBlackColorFormat = new TextFormat();
 		
 		var scaleDraw;
+		var randomUnitsAr = [];
 		
 		public function NumberLine()
 		{
@@ -435,6 +438,23 @@
 			toolArea.reset_btn.addEventListener("click", resetBtnHandler);
 			toolArea.find_btn.addEventListener("click", findNoBtnHandler);
 			toolArea.interval_txt.addEventListener("change", onTextChangeHandler);
+			
+			// hide units buttons;
+			var hideMc = toolArea.hideMc;
+			hideMc.hide_ran.gotoAndStop(2);
+			hideMc.show_all.gotoAndStop(1);
+			hideMc.hide_all.gotoAndStop(1);
+			
+			hideMc.hide_ran.addEventListener("click", unitsBtnHandler);
+			hideMc.show_all.addEventListener("click", unitsBtnHandler);
+			hideMc.hide_all.addEventListener("click", unitsBtnHandler);
+			
+			var answerMc = toolArea.answerMc;
+			answerMc.revealAnswer.gotoAndStop(1);
+			answerMc.typeAnswer.gotoAndStop(1);
+			
+			answerMc.revealAnswer.addEventListener("click", unitsBtnHandler);
+			answerMc.typeAnswer.addEventListener("click", unitsBtnHandler);
 		}
 		
 		function removeEvents()
@@ -445,6 +465,26 @@
 			toolArea.reset_btn.removeEventListener("click", resetBtnHandler);
 			toolArea.find_btn.removeEventListener("click", findNoBtnHandler);
 			toolArea.interval_txt.removeEventListener("change", onTextChangeHandler);
+		}
+		
+		function unitsBtnHandler(e){
+			var btnName = e.currentTarget.name;
+			trace("unitsBtnHandler:btnName " + btnName);
+			if (btnName == "hide_ran"){
+				
+			}
+			else if (btnName == "show_all"){
+				
+			}
+			else if (btnName == "hide_all"){
+				
+			}
+			else if (btnName == "revealAnswer"){
+				
+			}
+			else if (btnName == "typeAnswer"){
+				
+			}
 		}
 		
 		function createBtnHandler(e)

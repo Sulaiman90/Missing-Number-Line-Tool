@@ -44,6 +44,9 @@
 			//trace(stageMainRef1.name,mc1.name,this.name);
 			//_stageMainRef.logTxt.text = msg;
 		}*/
-
+		
+		public function isInArray(value, array) {
+			return array.indexOf(value) > -1;
+		}
 	}
 }
