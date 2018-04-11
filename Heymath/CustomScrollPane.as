@@ -53,7 +53,7 @@
 			ww = scrollTrack.width - scrollFaceWidth;
 			
 			//trace("moveVal "+moveVal,finalContentPos);
-			trace("contentWidth "+contentWidth);
+			//trace("contentWidth "+contentWidth);
 
 			rectangle = new Rectangle(xx,yy,ww,0);
 	
@@ -85,10 +85,10 @@
 		
 		function scrollFaceMoved(e){
 			//trace("scrollFaceMoved");
+			contentMain.parent.arrowMc.visible = false;
 			sliderState = "mouseMove";
 			stageRef.addEventListener(Event.ENTER_FRAME,moveContent);
 		}
-
 
 		function moveContent(e) {
 			//trace("moveContent ");
