@@ -54,6 +54,10 @@
 		var scaleDraw;
 		var randomUnitsAr = [];
 		
+		var hideMc;
+		var answerMc;
+		var check_btn;
+		
 		public function NumberLine()
 		{
 			trace("NumberLine ");
@@ -65,6 +69,8 @@
 			mainMov = mc;
 			toolArea = mainMov.toolArea;
 			scaleDraw = _scaleDraw;
+			hideMc = toolArea.hideMc;
+			answerMc = toolArea.answerMc;
 			initFun();
 		}
 		
@@ -78,11 +84,9 @@
 			
 			toolArea.findTxt_txt.addEventListener(KeyboardEvent.KEY_DOWN, handler); 	// testing purpose
 			
-			function handler(e:KeyboardEvent)
-			{
+			function handler(e:KeyboardEvent){
 				// if the key is ENTER
-				if (e.charCode == 13)
-				{
+				if (e.charCode == 13){
 					// your code here
 					findNoBtnHandler(e);
 				}
@@ -408,7 +412,7 @@
 			toolArea.interval_txt.addEventListener("change", onTextChangeHandler);
 			
 			// hide units buttons;
-			var hideMc = toolArea.hideMc;
+			
 			hideMc.hide_ran.gotoAndStop(2);
 			hideMc.show_all.gotoAndStop(1);
 			hideMc.hide_all.gotoAndStop(1);
@@ -417,7 +421,6 @@
 			hideMc.show_all.addEventListener("click", unitsBtnHandler);
 			hideMc.hide_all.addEventListener("click", unitsBtnHandler);
 			
-			var answerMc = toolArea.answerMc;
 			answerMc.revealAnswer.gotoAndStop(1);
 			answerMc.typeAnswer.gotoAndStop(1);
 			
@@ -433,25 +436,39 @@
 			toolArea.reset_btn.removeEventListener("click", resetBtnHandler);
 			toolArea.find_btn.removeEventListener("click", findNoBtnHandler);
 			toolArea.interval_txt.removeEventListener("change", onTextChangeHandler);
+			
+			hideMc.hide_ran.removeEventListener("click", unitsBtnHandler);
+			hideMc.show_all.removeEventListener("click", unitsBtnHandler);
+			hideMc.hide_all.removeEventListener("click", unitsBtnHandler);
+			
+			answerMc.revealAnswer.removeEventListener("click", unitsBtnHandler);
+			answerMc.typeAnswer.removeEventListener("click", unitsBtnHandler);
 		}
 		
 		function unitsBtnHandler(e){
 			var mc = e.currentTarget;
-			var btnName = mc.name;
-				
+			var btnName = mc.name;	
+			
+			if (mc.currentFrame == 2){
+				return;
+			}
+			
+			check_btn.visible = false;
+			
+			//trace("unitsBtnHandler:btnName " + btnName);
+					
 			if (btnName == "hide_ran" || btnName == "show_all" || btnName == "hide_all"){
-				toolArea.hideMc.hide_ran.gotoAndStop(1);
-				toolArea.hideMc.show_all.gotoAndStop(1);
-				toolArea.hideMc.hide_all.gotoAndStop(1);
+				resetUnitOptionBtns(1);
+				answerMc.mouseEnabled = true;
+				answerMc.mouseChildren = true;
+				answerMc.alpha = 1;
 			}
 			else if (btnName == "revealAnswer" || btnName == "typeAnswer"){
-				toolArea.answerMc.revealAnswer.gotoAndStop(1);
-				toolArea.answerMc.typeAnswer.gotoAndStop(1);
+				resetUnitOptionBtns(2);
 			}
 			
 			mc.gotoAndStop(2);
 		
-			trace("unitsBtnHandler:btnName " + btnName);
 			var lineContainerMc = toolArea.lineMc.getChildByName("lineContainer");
 			var unitLineMC;
 			var lineName;
@@ -459,33 +476,110 @@
 				for (var i = 0; i < TOTAL_UNITS; i++){
 					lineName =  "unitLine" + i;
 					unitLineMC = lineContainerMc.getChildByName(lineName);
+					unitLineMC.no_txt.text = unitLineMC.val;
 					unitLineMC.no_txt.visible = true;
-					if (unitLineMC.hide == true){
-						unitLineMC.no_txt.visible = false;
+					unitLineMC.box.visible = false;
+					if (unitLineMC.hide){
+						unitLineMC.tick.visible = true;
+						unitLineMC.box.visible = true;
+						if (unitLineMC.tick.currentLabel != "right"){
+							unitLineMC.no_txt.text = "?";
+							unitLineMC.tick.visible = false;
+						}
 					}
-				}
+				}	
 			}
 			else if (btnName == "show_all"){
 				for (i = 0; i < TOTAL_UNITS; i++){
 					lineName =  "unitLine" + i;
 					unitLineMC = lineContainerMc.getChildByName(lineName);
+					unitLineMC.no_txt.text = unitLineMC.val;
 					unitLineMC.no_txt.visible = true;
+					unitLineMC.box.visible = false;
+					unitLineMC.tick.visible = false;
+					unitLineMC.no_txt.mouseEnabled = false;
+					if (unitLineMC.hide){
+						unitLineMC.box.visible = true;
+					}
 				}
+				// disable answer option when show_all is selected
+				answerMc.mouseEnabled = false;
+				answerMc.mouseChildren = false;
+				answerMc.alpha = 0.6;
+				toolArea.answerMc.revealAnswer.gotoAndStop(1);
+				toolArea.answerMc.typeAnswer.gotoAndStop(1);
 			}
 			else if (btnName == "hide_all"){
 				for (i = 0; i < TOTAL_UNITS; i++){
-					lineName =  "unitLine" + i;
-					unitLineMC = lineContainerMc.getChildByName(lineName);
-					unitLineMC.no_txt.visible = false;
+					if (i!=0 && i!=TOTAL_UNITS-1){
+						lineName =  "unitLine" + i;
+						unitLineMC = lineContainerMc.getChildByName(lineName);
+						unitLineMC.no_txt.visible = false;
+						unitLineMC.box.visible = false;
+						unitLineMC.tick.visible = false;
+					}
 				}
+				answerMc.mouseEnabled = false;
+				answerMc.mouseChildren = false;
+				answerMc.alpha = 0.6;
+				toolArea.answerMc.revealAnswer.gotoAndStop(1);
+				toolArea.answerMc.typeAnswer.gotoAndStop(1);
 			}
 			else if (btnName == "revealAnswer"){
-				
+				for (i = 0; i < TOTAL_UNITS; i++){
+					lineName =  "unitLine" + i;
+					unitLineMC = lineContainerMc.getChildByName(lineName);
+					unitLineMC.box.visible = false;
+					unitLineMC.no_txt.visible = true;
+					unitLineMC.no_txt.mouseEnabled = false;
+					unitLineMC.tick.visible = false;
+					if (unitLineMC.hide){
+						unitLineMC.no_txt.text = unitLineMC.val;
+						unitLineMC.box.visible = true;
+						if (unitLineMC.tick.currentLabel=="right"){
+							unitLineMC.tick.visible = true;
+						}
+						else{
+							unitLineMC.tick.visible = false;
+						}
+					}
+				}
 			}
 			else if (btnName == "typeAnswer"){
-				
+				for (i = 0; i < TOTAL_UNITS; i++){
+					lineName =  "unitLine" + i;
+					unitLineMC = lineContainerMc.getChildByName(lineName);
+					unitLineMC.box.visible = false;
+					unitLineMC.no_txt.visible = true;
+					unitLineMC.no_txt.mouseEnabled = false;
+					if (unitLineMC.hide){
+						unitLineMC.no_txt.text = "?";
+						unitLineMC.box.visible = true;
+						if (unitLineMC.tick.currentLabel == "right"){
+							unitLineMC.no_txt.text = unitLineMC.val;
+							unitLineMC.tick.visible = true;
+						}
+						else{
+							unitLineMC.tick.visible = false;
+							unitLineMC.no_txt.mouseEnabled = true;
+						}
+					}
+				}
 			}
 		}
+		
+		function resetUnitOptionBtns(i){
+			if (i == 1){
+				toolArea.hideMc.hide_ran.gotoAndStop(1);
+				toolArea.hideMc.show_all.gotoAndStop(1);
+				toolArea.hideMc.hide_all.gotoAndStop(1);
+			}
+			else if (i==2){
+				toolArea.answerMc.revealAnswer.gotoAndStop(1);
+				toolArea.answerMc.typeAnswer.gotoAndStop(1);
+			}
+		}
+		
 		
 		function createBtnHandler(e)
 		{
@@ -571,17 +665,13 @@
 			}
 		}
 	
-		function focusInHandler(e)
-		{
+		function focusInHandler(e){
 			e.target.text = "";
 		}
 		
-		function focusOutHandler(evt)
-		{
-			if (evt.target.text == "")
-			{
-				if (evt.target.name == "interval_txt")
-				{
+		function focusOutHandler(evt){
+			if (evt.target.text == ""){
+				if (evt.target.name == "interval_txt"){
 					evt.target.text = "1";
 				}
 				else

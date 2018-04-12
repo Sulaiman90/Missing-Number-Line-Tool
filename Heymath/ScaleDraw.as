@@ -8,6 +8,9 @@
 	{
 		
 		var slider;
+		var selectedBox;
+		var totalRightCnt = 0;
+		var totalDisplayUnits = 0;
 		
 		public function ScaleDraw()
 		{
@@ -17,16 +20,22 @@
 		public function initScaleDraw(_rootMain)
 		{
 			//trace("initScaleDraw ");
+			resetVars();
 			initNumberLine(_rootMain, this);
+		}
+		
+		function resetVars(){
+			totalRightCnt = 0;
+			totalDisplayUnits = 0;
 		}
 		
 		public function generateScale()
 		{
+			trace("generateScale ");
+			
 			var startingPointX = SCALE_STARTING_POS_X;
 			var startingPointY = SCALE_STARTING_POS_Y;
 			var scrollSpeedValue;
-			
-			//scaleArea.arrowMc.x = 400;
 			
 			var scaleEndVal = scaleStartingValue + (TOTAL_UNITS * intervalNo) - intervalNo;
 			
@@ -81,9 +90,7 @@
 			
 			randomUnitsAr.sort(compareNumbers); 
 			//trace("randomUnitsAr " + randomUnitsAr);
-			
-			//randomUnitsAr = [6, 8, 11, 3, 20, 18, 16, 13, 29, 33, 36, 27, 44, 40, 48, 42, 50, 53, 56, 58, 66, 62, 71, 64, 83, 73, 77, 79, 92, 86, 96, 89];
-			
+				
 			for (var i = 0; i < TOTAL_UNITS; i++)
 			{
 				var unitLineMC = new unitLine();
@@ -95,11 +102,24 @@
 				var txtStr = scaleStartingValue + (i * intervalNo);
 				unitLineMC.no_txt.text = txtStr;
 				unitLineMC.val = txtStr;
+				unitLineMC.no_txt.mouseEnabled = false;
 				unitLineMC.hide = false;
+				unitLineMC.box.visible = false;
+				unitLineMC.tick.visible = false;
 				//trace("ii " + i,isInArray((i), randomUnitsAr) );
 				if (isInArray(i, randomUnitsAr)){
-					unitLineMC.no_txt.visible = false;
+					unitLineMC.no_txt.text = "?";
 					unitLineMC.hide = true;
+					unitLineMC.box.visible = true;
+					
+					var refTxt = unitLineMC.no_txt;
+					refTxt.maxChars = 5;
+					refTxt.restrict = "0-9\\-";
+					refTxt.addEventListener("focusIn", focusInNoHandler);
+					refTxt.addEventListener("focusOut", focusOutNoHandler);
+					refTxt.addEventListener("change", changeFn);
+					unitLineMC.tick.visible = true;
+					unitLineMC.tick.gotoAndStop("none");
 				}
 				//trace("i " + i, txtStr, scaleUnitPos);	
 				
@@ -124,12 +144,69 @@
 			toolArea.txt1.text = scaleStartingValue;
 			toolArea.txt2.text = scaleEndVal;
 			
+			// set movieclip state after creating new scale
+			resetUnitOptionBtns(1);
+			toolArea.hideMc.hide_ran.gotoAndStop(2);
+			
+			// add a checkbtn to scale
+			check_btn = new checkBtn();
+			lineContainer.addChild(check_btn);
+			
+			check_btn.addEventListener("click", checkBtnHandler);
+			check_btn.visible = false;
+			check_btn.y = -25;
+			
 		/*trace("createScale:minScaleValue,maxScaleValue " +  (scaleStartingValue+(minDisplayUnits*intervalNo)),
 		   (scaleEndVal - (minDisplayUnits*intervalNo) - 1));*/
 		}
 		
-		function removeAddedChilds()
-		{
+		function validationCheck(){
+			var txtStr = selectedBox.no_txt.text;
+			var ansStr = selectedBox.val;
+			selectedBox.tick.visible = true;
+			if (txtStr == "" || txtStr == "?"){
+				check_btn.visible = false;
+				selectedBox.no_txt.text = "?";
+				selectedBox.tick.gotoAndStop("none");
+			}
+			else if (txtStr == ansStr){
+				selectedBox.no_txt.mouseEnabled = false;
+				selectedBox.tick.gotoAndStop("right");
+				check_btn.visible = false;
+				totalRightCnt++;
+			}
+			else if (txtStr != ansStr){
+				selectedBox.tick.gotoAndStop("wrong");
+			}
+			if (totalRightCnt > totalDisplayUnits){
+				trace("ALL ANSWERS DONE");
+			}
+		}
+		
+		function checkBtnHandler(e){
+			validationCheck();
+		}
+				
+		function focusInNoHandler(e){
+			e.target.text = "";
+			selectedBox = e.currentTarget.parent;
+			selectedBox.tick.gotoAndStop("none");
+			var id = selectedBox.val;
+			var posX = e.currentTarget.parent.x;
+			trace("id " + id + " posX " + posX);
+			check_btn.visible = true;
+			check_btn.x = posX;
+		}
+		
+		function focusOutNoHandler(evt){
+			if (evt.target.text == ""){
+				evt.target.text = "?";
+			}
+			selectedBox = evt.currentTarget.parent;
+			validationCheck();
+		}
+		
+		function removeAddedChilds(){
 			var lineContainerMc = toolArea.lineMc.getChildByName("lineContainer");
 			//trace("removeAddedChilds " + lineContainerMc.numChildren);
 			toolArea.lineMc.removeChild(lineContainerMc);
@@ -146,10 +223,10 @@
 			var randomNo;
 			var loopTaken = 0;
 			
-			var totalUnitsCnt = (Math.round(100 / displayUnits)) * visibleUnits;
+			totalDisplayUnits = (Math.round(100 / displayUnits)) * visibleUnits;
 			var noOfTimes = (Math.round(100 / displayUnits));
 			
-			//trace("totalUnitsCnt " + totalUnitsCnt);
+			//trace("totalDisplayUnits " + totalDisplayUnits);
 			
 			generate();			
 			
@@ -159,10 +236,10 @@
 			function checkAndRegenerate(){
 				//trace("----------------");
 				//trace("checkAndRegenerate:randomUnitsAr "+randomUnitsAr);
-				if (randomUnitsAr.length < totalUnitsCnt){
+				if (randomUnitsAr.length < totalDisplayUnits){
 					startNo = startNo + displayUnits;
-					if (randomUnitsAr.length == (totalUnitsCnt - visibleUnits)){
-						endNo = 100;
+					if (randomUnitsAr.length == (totalDisplayUnits - visibleUnits)){
+						endNo = 99;
 					}
 					else{
 						endNo = endNo + displayUnits;

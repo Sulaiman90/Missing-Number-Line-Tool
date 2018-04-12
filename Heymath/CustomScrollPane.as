@@ -151,7 +151,7 @@
 			trace("scrollFaceUp "+scrollFace.x,contentMain.x);
 			//MovieClip(root).logMsg("scrollFaceUp");
 			currentMov.stopDrag();
-			currentMov.stage.addEventListener(MouseEvent.MOUSE_UP,scrollFaceUp);
+			currentMov.stage.removeEventListener(MouseEvent.MOUSE_UP,scrollFaceUp);
 			stageRef.removeEventListener(Event.ENTER_FRAME, moveContent);
 			currentMov.removeEventListener(MouseEvent.MOUSE_MOVE, scrollFaceMoved);
 		}
