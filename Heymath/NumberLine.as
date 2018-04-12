@@ -31,9 +31,9 @@
 		
 		var scrollTrackUnit;
 		
-		var scaleStartingValue = 100;
+		var scaleStartingValue = 0;
 		var scaleEndingValue = 0;
-		var intervalNo = 2;
+		var intervalNo = 1;
 		
 		var unitGap = [60, 100]; // 0th value upto 3 digits & 1st value for more than 3 digits
 		var scrollSpeed = [30, 60];
@@ -468,16 +468,45 @@
 		}
 		
 		function unitsBtnHandler(e){
-			var btnName = e.currentTarget.name;
+			var mc = e.currentTarget;
+			
+			toolArea.hideMc.hide_ran.gotoAndStop(1);
+			toolArea.hideMc.show_all.gotoAndStop(1);
+			toolArea.hideMc.hide_all.gotoAndStop(1);
+			
+			mc.gotoAndStop(2);
+			
+			var btnName = mc.name;
 			trace("unitsBtnHandler:btnName " + btnName);
+			var lineContainerMc = toolArea.lineMc.getChildByName("lineContainer");
+			var unitLineMC;
+			var lineName;
 			if (btnName == "hide_ran"){
-				
+				for (var i = 0; i < TOTAL_UNITS; i++)
+				{
+					lineName =  "unitLine" + i;
+					unitLineMC = lineContainerMc.getChildByName(lineName);
+					unitLineMC.no_txt.visible = true;
+					if (unitLineMC.hide == true){
+						unitLineMC.no_txt.visible = false;
+					}
+				}
 			}
 			else if (btnName == "show_all"){
-				
+				for (i = 0; i < TOTAL_UNITS; i++)
+				{
+					lineName =  "unitLine" + i;
+					unitLineMC = lineContainerMc.getChildByName(lineName);
+					unitLineMC.no_txt.visible = true;
+				}
 			}
 			else if (btnName == "hide_all"){
-				
+				for (i = 0; i < TOTAL_UNITS; i++)
+				{
+					lineName =  "unitLine" + i;
+					unitLineMC = lineContainerMc.getChildByName(lineName);
+					unitLineMC.no_txt.visible = false;
+				}
 			}
 			else if (btnName == "revealAnswer"){
 				

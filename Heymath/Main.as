@@ -48,5 +48,18 @@
 		public function isInArray(value, array) {
 			return array.indexOf(value) > -1;
 		}
+		
+		public function existsInArray(value,arr){
+			for(var i=0;i<arr.length;i++){
+				if(value==arr[i]){
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		public function compareNumbers(a, b) {
+		  return a - b;
+		}
 	}
 }

@@ -79,7 +79,10 @@
 			// genreate random numbers to hide the units
 			generateRandomNos();
 			
+			randomUnitsAr.sort(compareNumbers); 
 			trace("randomUnitsAr " + randomUnitsAr);
+			
+			//randomUnitsAr = [6, 8, 11, 3, 20, 18, 16, 13, 29, 33, 36, 27, 44, 40, 48, 42, 50, 53, 56, 58, 66, 62, 71, 64, 83, 73, 77, 79, 92, 86, 96, 89];
 			
 			for (var i = 0; i < TOTAL_UNITS; i++)
 			{
@@ -91,12 +94,12 @@
 				unitLineMC.x = scaleUnitPos;
 				var txtStr = scaleStartingValue + (i * intervalNo);
 				unitLineMC.no_txt.text = txtStr;
-				trace("i " + i,isInArray((i+1), randomUnitsAr));
-				if (isInArray(5, [1,2,3,4,5])){
+				unitLineMC.val = txtStr;
+				unitLineMC.hide = false;
+				//trace("ii " + i,isInArray((i), randomUnitsAr) );
+				if (isInArray(i, randomUnitsAr)){
 					unitLineMC.no_txt.visible = false;
-				}
-				else{
-					unitLineMC.no_txt.visible = true;
+					unitLineMC.hide = true;
 				}
 				//trace("i " + i, txtStr, scaleUnitPos);	
 				
@@ -143,7 +146,8 @@
 			var randomNo;
 			var loopTaken = 0;
 			
-			var totalUnitsCnt = (Math.round(100 / displayUnits));
+			var totalUnitsCnt = (Math.round(100 / displayUnits)) * visibleUnits;
+			var noOfTimes = (Math.round(100 / displayUnits));
 			
 			trace("totalUnitsCnt " + totalUnitsCnt);
 			
@@ -157,7 +161,13 @@
 				trace("checkAndRegenerate:randomUnitsAr "+randomUnitsAr);
 				if (randomUnitsAr.length < totalUnitsCnt){
 					startNo = startNo + displayUnits;
-					endNo = endNo + displayUnits;
+					if (randomUnitsAr.length == (totalUnitsCnt - visibleUnits)){
+						endNo = 100;
+					}
+					else{
+						endNo = endNo + displayUnits;
+					}
+					trace("startNo " + startNo + " endNo " + endNo);
 					generate();
 				}
 			}
@@ -181,7 +191,10 @@
 				}
 				if (randomAr.length == visibleUnits){
 					//trace("generate:randomAr " + randomAr);
-					randomUnitsAr.push(randomAr);
+					//randomUnitsAr.push(randomAr);
+					for (var i = 0; i < randomAr.length; i++){
+						randomUnitsAr.push(randomAr[i]);
+					}
 					randomAr = [];
 					checkAndRegenerate();
 				}
