@@ -97,7 +97,7 @@
 		{
 			toolArea.startNo_txt.text = scaleStartingValue;
 			toolArea.interval_txt.text = intervalNo;
-			toolArea.findTxt_txt.text = 0;
+			toolArea.findTxt_txt.text = "?";
 			
 			textGrayColorFormat.color = GRAY_COLOR;
 			textBlackColorFormat.color = BLACK_COLOR;
@@ -110,7 +110,7 @@
 			enableText(toolArea.startNo_txt);
 			enableText(toolArea.interval_txt);
 			
-			enableInputText(toolArea.startNo_txt, 5 , true);
+			enableInputText(toolArea.startNo_txt, 6 , true);
 			enableInputText(toolArea.interval_txt, 2 , false);
 			enableInputText(toolArea.findTxt_txt, 5, true);
 			
@@ -125,11 +125,14 @@
 		
 		function findNoBtnHandler(e)
 		{
-			
-			toolArea.arrowMc.visible = true;
+			if (toolArea.findTxt_txt.text == "" || toolArea.findTxt_txt.text == "?"){
+				return;
+			}
 			
 			var findTxtNo = Number(toolArea.findTxt_txt.text);	
 			
+			toolArea.arrowMc.visible = true;
+				
 			//trace("fourDigitNoEntered " + fourDigitNoEntered,maxScaleNum,scaleEndingValue);
 			
 			var minScaleValue = scaleStartingValue;
@@ -596,6 +599,8 @@
 			enableButton(toolArea.reset_btn);
 			
 			toolArea.arrowMc.visible = false;
+			
+			toolArea.findTxt_txt.text = "?";
 		}
 		
 		function resetBtnHandler(e)
@@ -652,16 +657,27 @@
 			refTxt.addEventListener("change", changeFn);
 		}
 		
+		var tmp = "";
 		function changeFn(e){
-			/*var final1 = e.currentTarget.text.split(".");
-			if(final1.length >= 3){
-				e.currentTarget.text = (final1[0]+"."+final1[1]+final1[2]);
-			}*/
-			
-			var final2 = e.currentTarget.text.split("-");
-			//trace("final2 "+final2);
-			if(final2.length >= 3){
-				e.currentTarget.text = (final2[0]+"-"+final2[1]+final2[2]);
+			var txtName = e.currentTarget.name;
+			if (txtName == "startNo_txt" || txtName == "findTxt_txt"){
+				var str = e.currentTarget.text;
+				//trace("--- : "  +str.match(/^[*\+\-]?[\d]*\.?[\d]*$/));
+				if (str.match(/^[*\+\-]?[\d]*\.?[\d]*$/) != null){
+					
+				}else{
+					e.currentTarget.text = tmp;
+					str = e.currentTarget.text;
+				}
+				var ar = str.split("");
+				if (ar[0]=="-"){
+					e.currentTarget.maxChars = 6;
+				}else{
+					e.currentTarget.maxChars = 5;
+				}
+				
+				tmp = str;
+				e.preventDefault();
 			}
 		}
 	
@@ -674,9 +690,11 @@
 				if (evt.target.name == "interval_txt"){
 					evt.target.text = "1";
 				}
-				else
-				{
+				else if (evt.target.name == "startNo_txt"){
 					evt.target.text = "0";
+				}
+				else{
+					evt.target.text = "?";
 				}
 			}
 		}

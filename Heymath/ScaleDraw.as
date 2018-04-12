@@ -146,6 +146,7 @@
 			
 			// set movieclip state after creating new scale
 			resetUnitOptionBtns(1);
+			resetUnitOptionBtns(2);
 			toolArea.hideMc.hide_ran.gotoAndStop(2);
 			
 			// add a checkbtn to scale
@@ -193,7 +194,7 @@
 			selectedBox.tick.gotoAndStop("none");
 			var id = selectedBox.val;
 			var posX = e.currentTarget.parent.x;
-			trace("id " + id + " posX " + posX);
+			//trace("id " + id + " posX " + posX);
 			check_btn.visible = true;
 			check_btn.x = posX;
 		}
