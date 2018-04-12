@@ -106,9 +106,9 @@
 			enableText(toolArea.startNo_txt);
 			enableText(toolArea.interval_txt);
 			
-			enableInputText(toolArea.startNo_txt, 5);
-			enableInputText(toolArea.interval_txt, 2);
-			enableInputText(toolArea.findTxt_txt, 5);
+			enableInputText(toolArea.startNo_txt, 5 , true);
+			enableInputText(toolArea.interval_txt, 2 , false);
+			enableInputText(toolArea.findTxt_txt, 5, true);
 			
 			scrollTrackUnit = STAGE_WIDTH / (TOTAL_UNITS - 1);
 			
@@ -124,22 +124,7 @@
 			
 			toolArea.arrowMc.visible = true;
 			
-			var findTxtNo = Number(toolArea.findTxt_txt.text);
-			
-			var maxScaleNum = 0;
-			
-			/*if (findTxtNo + 50 >= 1000 ){
-			   fourDigitNoEntered = true;
-			   minDisplayUnits = minDisplayUnitsAr[1];
-			   }
-			   else{
-			   fourDigitNoEntered = false;
-			   minDisplayUnits = minDisplayUnitsAr[0];
-			   if (intervalNo > 5 && intervalNo < 10){
-			   var dif = intervalNo - 5;
-			   minDisplayUnits = minDisplayUnits - dif;
-			   }
-			   }*/
+			var findTxtNo = Number(toolArea.findTxt_txt.text);	
 			
 			//trace("fourDigitNoEntered " + fourDigitNoEntered,maxScaleNum,scaleEndingValue);
 			
@@ -204,18 +189,7 @@
 				
 				moveArrowMc(scaleIntervalNo);
 				
-				trace("findTxtNo " + findTxtNo + " arrowXPos " + arrowXPos + " lineScaleX " + lineScaleX);
-				
-				/*if (fourDigitNoEntered){
-				   arrowXPos = arrowXPos-50;
-				   }
-				   toolArea.arrowMc.x = arrowXPos;
-				
-				   if (intervalVal < 0 && scaleGapVal < minScaleValue){
-				   trace("lessThanMinScale");
-				   lessThanMinScale();
-				   }
-				   checkScaleValue();*/
+				trace("findTxtNo " + findTxtNo + " arrowXPos " + arrowXPos + " lineScaleX " + lineScaleX);			
 			}
 			else if (findTxtNo > maxScaleLimit)
 			{
@@ -469,21 +443,26 @@
 		
 		function unitsBtnHandler(e){
 			var mc = e.currentTarget;
-			
-			toolArea.hideMc.hide_ran.gotoAndStop(1);
-			toolArea.hideMc.show_all.gotoAndStop(1);
-			toolArea.hideMc.hide_all.gotoAndStop(1);
+			var btnName = mc.name;
+				
+			if (btnName == "hide_ran" || btnName == "show_all" || btnName == "hide_all"){
+				toolArea.hideMc.hide_ran.gotoAndStop(1);
+				toolArea.hideMc.show_all.gotoAndStop(1);
+				toolArea.hideMc.hide_all.gotoAndStop(1);
+			}
+			else if (btnName == "revealAnswer" || btnName == "typeAnswer"){
+				toolArea.answerMc.revealAnswer.gotoAndStop(1);
+				toolArea.answerMc.typeAnswer.gotoAndStop(1);
+			}
 			
 			mc.gotoAndStop(2);
-			
-			var btnName = mc.name;
+		
 			trace("unitsBtnHandler:btnName " + btnName);
 			var lineContainerMc = toolArea.lineMc.getChildByName("lineContainer");
 			var unitLineMC;
 			var lineName;
 			if (btnName == "hide_ran"){
-				for (var i = 0; i < TOTAL_UNITS; i++)
-				{
+				for (var i = 0; i < TOTAL_UNITS; i++){
 					lineName =  "unitLine" + i;
 					unitLineMC = lineContainerMc.getChildByName(lineName);
 					unitLineMC.no_txt.visible = true;
@@ -493,16 +472,14 @@
 				}
 			}
 			else if (btnName == "show_all"){
-				for (i = 0; i < TOTAL_UNITS; i++)
-				{
+				for (i = 0; i < TOTAL_UNITS; i++){
 					lineName =  "unitLine" + i;
 					unitLineMC = lineContainerMc.getChildByName(lineName);
 					unitLineMC.no_txt.visible = true;
 				}
 			}
 			else if (btnName == "hide_all"){
-				for (i = 0; i < TOTAL_UNITS; i++)
-				{
+				for (i = 0; i < TOTAL_UNITS; i++){
 					lineName =  "unitLine" + i;
 					unitLineMC = lineContainerMc.getChildByName(lineName);
 					unitLineMC.no_txt.visible = false;
@@ -571,15 +548,35 @@
 			}
 		}
 		
-		function enableInputText(_refTxt, _maxChars)
+		function enableInputText(_refTxt, _maxChars, _minus)
 		{
 			var refTxt = _refTxt;
 			refTxt.maxChars = _maxChars;
-			refTxt.restrict = "0-9";
+			if (_minus){
+				refTxt.restrict = "0-9\\-";
+			}
+			else{
+				refTxt.restrict = "0-9";
+			}
+			//refTxt.regex = /^[*\+\-]?[\d]*\.?[\d]*$/;
 			refTxt.addEventListener("focusIn", focusInHandler);
 			refTxt.addEventListener("focusOut", focusOutHandler);
+			refTxt.addEventListener("change", changeFn);
 		}
 		
+		function changeFn(e){
+			/*var final1 = e.currentTarget.text.split(".");
+			if(final1.length >= 3){
+				e.currentTarget.text = (final1[0]+"."+final1[1]+final1[2]);
+			}*/
+			
+			var final2 = e.currentTarget.text.split("-");
+			//trace("final2 "+final2);
+			if(final2.length >= 3){
+				e.currentTarget.text = (final2[0]+"-"+final2[1]+final2[2]);
+			}
+		}
+	
 		function focusInHandler(e)
 		{
 			e.target.text = "";
