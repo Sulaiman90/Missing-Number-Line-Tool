@@ -320,108 +320,11 @@
 			else{
 				toolArea.startNo_txt.setTextFormat(textGrayColorFormat);
 			}
-			
-			// find text no less than min scale value and > scale starting value > 0
-			function lessThanMinScale()
-			{
-				scaleDraw.removeAddedChilds();
-				var arrowXPos;
-				// check if the scale should start from zero
-				var val = findTxtNo - scaleStartingValue - (50 * intervalNo);
-				trace("find value gone before:val " + val);
-				if (val > 0)
-				{
-					scaleStartingValue = val;
-					createScale();
-					toolArea.lineMc.x = 0 - unitGapValue * (50 - minDisplayUnits);
-					moveScrollFace(findTxtNo);
-				}
-				else
-				{
-					var val2 = findTxtNo - (50 * intervalNo);
-					if (val2 > minDisplayUnits)
-					{
-						scaleStartingValue = val2;
-						trace("if");
-					}
-					else
-					{
-						trace("else:start scale from zero ");
-						scaleStartingValue = 0;
-					}
-					
-					// create the scale again
-					createScale();
-					
-					// move the scroll Face
-					intervalVal = ((findTxtNo - scaleStartingValue) / intervalNo) - minDisplayUnits;
-					
-					trace(" create scale again:val2 " + val2 + " intervalVal " + intervalVal);
-					
-					if (intervalVal <= 0)
-					{
-						intervalVal = 0;
-						toolArea.scrollFace.x = SCROLL_FACE_STARTING_POINT;
-					}
-					else
-					{
-						moveScrollFace(findTxtNo);
-					}
-					
-					// move line scale
-					
-					scaleIntervalNo = Math.abs(findTxtNo - scaleStartingValue) / intervalNo;
-					lineScaleX = 0 - ((scaleIntervalNo * unitGapValue) - (minDisplayUnits * 50));
-					trace("scaleIntervalNo " + scaleIntervalNo);
-					if (lineScaleX > 0)
-					{
-						lineScaleX = 0;
-					}
-					toolArea.lineMc.x = lineScaleX;
-					
-					trace("findTxtNo " + findTxtNo + " lineScaleX " + lineScaleX);
-					
-					// arrow pos calc	
-					var findTxtMinLimit = minDisplayUnits;
-					var findTxtMaxLimit = TOTAL_UNITS - minDisplayUnits;
-					trace("findTxtMinLimit " + findTxtMinLimit + " findTxtMaxLimit " + findTxtMaxLimit);
-					
-					// arrow x calculation 	
-					if (scaleIntervalNo >= findTxtMinLimit && (scaleIntervalNo <= findTxtMaxLimit))
-					{
-						// > && < than findTxtMinLimit,findTxtMaxLimit -- make it as center
-						trace("moveArrowMc:within scale");
-						arrowXPos = STAGE_WIDTH / 2;
-					}
-					else if (scaleIntervalNo < findTxtMinLimit)
-					{
-						// < than findTxtMinLimit, make it as center
-						trace("moveArrowMc: < min scale limit");
-						arrowXPos = SCALE_STARTING_POS_X + 0 + (scaleIntervalNo * unitGapValue);
-						if (lineScaleX == 0){
-							arrowXPos = arrowXPos + SCALE_LEFT_RIGHT_PADDING;
-						}
-					}
-					else if (scaleIntervalNo > findTxtMaxLimit)
-					{
-						// move arrow 
-						// find the difference between center and findtxt value
-						trace("moveArrowMc: > max scale limit");
-						var val1 = (STAGE_WIDTH / 2) + ((scaleIntervalNo - (TOTAL_UNITS - minDisplayUnits)) * unitGapValue);
-						//trace("val1 " + val1);
-						arrowXPos = val1;
-					}
-					toolArea.arrowMc.x = arrowXPos;
-				}
-				checkScaleValue();
-			}
 		}
 		
 		// check if scale values are greater than 1000
-		function checkScaleValue()
-		{
-			if (fourDigitNoEntered)
-			{
+		function checkScaleValue(){
+			if (fourDigitNoEntered){
 				toolArea.lineMc.x = toolArea.lineMc.x - 50;
 			}
 		}
