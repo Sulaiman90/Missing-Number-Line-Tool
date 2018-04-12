@@ -80,7 +80,7 @@
 			generateRandomNos();
 			
 			randomUnitsAr.sort(compareNumbers); 
-			trace("randomUnitsAr " + randomUnitsAr);
+			//trace("randomUnitsAr " + randomUnitsAr);
 			
 			//randomUnitsAr = [6, 8, 11, 3, 20, 18, 16, 13, 29, 33, 36, 27, 44, 40, 48, 42, 50, 53, 56, 58, 66, 62, 71, 64, 83, 73, 77, 79, 92, 86, 96, 89];
 			
@@ -149,16 +149,16 @@
 			var totalUnitsCnt = (Math.round(100 / displayUnits)) * visibleUnits;
 			var noOfTimes = (Math.round(100 / displayUnits));
 			
-			trace("totalUnitsCnt " + totalUnitsCnt);
+			//trace("totalUnitsCnt " + totalUnitsCnt);
 			
 			generate();			
 			
-			trace("loopTaken " + loopTaken);
-			trace("generateRandomNos:randomUnitsAr " + randomUnitsAr + " length "+randomUnitsAr.length);
+			//trace("loopTaken " + loopTaken);
+			//trace("generateRandomNos:randomUnitsAr " + randomUnitsAr + " length "+randomUnitsAr.length);
 				
 			function checkAndRegenerate(){
-				trace("----------------");
-				trace("checkAndRegenerate:randomUnitsAr "+randomUnitsAr);
+				//trace("----------------");
+				//trace("checkAndRegenerate:randomUnitsAr "+randomUnitsAr);
 				if (randomUnitsAr.length < totalUnitsCnt){
 					startNo = startNo + displayUnits;
 					if (randomUnitsAr.length == (totalUnitsCnt - visibleUnits)){
@@ -167,7 +167,7 @@
 					else{
 						endNo = endNo + displayUnits;
 					}
-					trace("startNo " + startNo + " endNo " + endNo);
+					//trace("startNo " + startNo + " endNo " + endNo);
 					generate();
 				}
 			}
