@@ -35,7 +35,7 @@
 		var scaleEndingValue = 0;
 		var intervalNo = 1;
 		
-		var unitGap = [60, 100]; // 0th value upto 3 digits & 1st value for more than 3 digits
+		var unitGap = [70, 100]; // 0th value upto 3 digits & 1st value for more than 3 digits
 		var scrollSpeed = [30, 60];
 		
 		var minDisplayUnitsAr = [7, 4];
@@ -128,6 +128,8 @@
 			if (toolArea.findTxt_txt.text == "" || toolArea.findTxt_txt.text == "?"){
 				return;
 			}
+			
+			check_btn.visible = false;
 			
 			var findTxtNo = Number(toolArea.findTxt_txt.text);	
 			
@@ -476,6 +478,7 @@
 			var unitLineMC;
 			var lineName;
 			if (btnName == "hide_ran"){
+				answerMc.typeAnswer.gotoAndStop(2);
 				for (var i = 0; i < TOTAL_UNITS; i++){
 					lineName =  "unitLine" + i;
 					unitLineMC = lineContainerMc.getChildByName(lineName);
@@ -488,6 +491,7 @@
 						if (unitLineMC.tick.currentLabel != "right"){
 							unitLineMC.no_txt.text = "?";
 							unitLineMC.tick.visible = false;
+							unitLineMC.no_txt.mouseEnabled = true;
 						}
 					}
 				}	

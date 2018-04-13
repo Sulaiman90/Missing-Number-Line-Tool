@@ -148,7 +148,7 @@
 		}
 
 		function scrollFaceUp(e) {
-			trace("scrollFaceUp "+scrollFace.x,contentMain.x);
+			//trace("scrollFaceUp "+scrollFace.x,contentMain.x);
 			//MovieClip(root).logMsg("scrollFaceUp");
 			currentMov.stopDrag();
 			currentMov.stage.removeEventListener(MouseEvent.MOUSE_UP,scrollFaceUp);

@@ -44,20 +44,31 @@
 			
 			//trace("intervalNo " + intervalNo,toolArea.name);
 			
-			if (intervalNo < 6)
-			{
+			if (intervalNo < 6){
 				unitGapValue = unitGap[0];
 			}
-			else
-			{
-				unitGapValue = (intervalNo * 10) + (60 - 50); // change according to unitGapValue
+			else{
+				unitGapValue = (intervalNo * 10) + (unitGap[0] - 50); // change according to unitGapValue
 			}
 			
-			// total units present in screen
-			displayUnits = Math.round((STAGE_WIDTH - (SCALE_LEFT_RIGHT_PADDING * 2)) / unitGapValue);
-			visibleUnits = Math.floor(displayUnits/3);
+			trace("-------------------------------- ");
 			
-			trace("unitGapValue "+unitGapValue +" displayUnits "+displayUnits  +" visibleUnits "+visibleUnits);
+			// total units present in screen
+			
+			displayUnits = 1;
+			var val = 0;
+			while (val < STAGE_WIDTH){	
+				//trace(" displayUnits " + (intervalNo * (displayUnits - 1)) +" val " + val );
+				val = SCALE_LEFT_RIGHT_PADDING + 0 + (unitGapValue * displayUnits);	
+				if (val >= STAGE_WIDTH){
+					break;
+				}	
+				displayUnits++;
+				//trace("val " + val + " displayUnits " + displayUnits);	
+			}
+			
+			visibleUnits = parseInt(displayUnits / 3);
+			trace("unitGapValue " + unitGapValue +" displayUnits " + displayUnits  +" visibleUnits " + visibleUnits);
 			
 			scrollSpeedValue = scrollSpeed[0];
 			var totalScaleWidth = (unitGapValue * (TOTAL_UNITS - 1) + (SCALE_LEFT_RIGHT_PADDING * 2));	
@@ -88,7 +99,13 @@
 			// genreate random numbers to hide the units
 			generateRandomNos();
 			
-			randomUnitsAr.sort(compareNumbers); 
+			trace(" scaleEndingValue " + scaleEndingValue);
+			var boxFrameNo = 1;
+			var scaleEndValueLen = scaleEndingValue.toString().length;
+			if(scaleEndValueLen > 3){
+				boxFrameNo = scaleEndValueLen - 1;
+			}
+			
 			//trace("randomUnitsAr " + randomUnitsAr);
 				
 			for (var i = 0; i < TOTAL_UNITS; i++)
@@ -106,14 +123,16 @@
 				unitLineMC.hide = false;
 				unitLineMC.box.visible = false;
 				unitLineMC.tick.visible = false;
+				unitLineMC.box.gotoAndStop(boxFrameNo);
 				//trace("ii " + i,isInArray((i), randomUnitsAr) );
 				if (isInArray(i, randomUnitsAr)){
 					unitLineMC.no_txt.text = "?";
 					unitLineMC.hide = true;
 					unitLineMC.box.visible = true;
+					unitLineMC.no_txt.mouseEnabled = true;
 					
 					var refTxt = unitLineMC.no_txt;
-					refTxt.maxChars = 5;
+					refTxt.maxChars = scaleEndValueLen;
 					refTxt.restrict = "0-9\\-";
 					refTxt.addEventListener("focusIn", focusInNoHandler);
 					refTxt.addEventListener("focusOut", focusOutNoHandler);
@@ -147,7 +166,8 @@
 			// set movieclip state after creating new scale
 			resetUnitOptionBtns(1);
 			resetUnitOptionBtns(2);
-			toolArea.hideMc.hide_ran.gotoAndStop(2);
+			hideMc.hide_ran.gotoAndStop(2);
+			answerMc.typeAnswer.gotoAndStop(2);
 			
 			// add a checkbtn to scale
 			check_btn = new checkBtn();
@@ -217,7 +237,7 @@
 		// generate random numbers for scale units
 		function generateRandomNos(){
 			var startNo = 1;
-			var endNo = displayUnits;
+			var endNo = displayUnits-1;
 			
 			var randomAr = [];
 			randomUnitsAr = [];
@@ -225,14 +245,18 @@
 			var loopTaken = 0;
 			
 			totalDisplayUnits = (Math.round(100 / displayUnits)) * visibleUnits;
-			var noOfTimes = (Math.round(100 / displayUnits));
-			
-			//trace("totalDisplayUnits " + totalDisplayUnits);
+			//var noOfTimes = (Math.round(100 / displayUnits));
+			var randomIntervalGap = endNo - startNo;
+		
+			trace("totalDisplayUnits " + totalDisplayUnits);
+			trace("startNo " + startNo + " endNo " + endNo);
 			
 			generate();			
 			
+			randomUnitsAr.sort(compareNumbers); 
+			
 			//trace("loopTaken " + loopTaken);
-			//trace("generateRandomNos:randomUnitsAr " + randomUnitsAr + " length "+randomUnitsAr.length);
+			trace("generateRandomNos:randomUnitsAr " + randomUnitsAr + " length "+randomUnitsAr.length);
 				
 			function checkAndRegenerate(){
 				//trace("----------------");
@@ -245,6 +269,7 @@
 					else{
 						endNo = endNo + displayUnits;
 					}
+					randomIntervalGap = endNo - startNo;
 					//trace("startNo " + startNo + " endNo " + endNo);
 					generate();
 				}
@@ -259,11 +284,12 @@
 					if (!isInArray(randomNo, randomAr)){
 						//trace("value not exists in array");
 						if (!checkIfGapExists(randomNo)){
-							//trace("gap not exists");
+							//trace("gap not exists:randomNo "+randomNo + " randomAr "+randomAr);
 							randomAr.push(randomNo);
 						}
-						else{
+						else if(randomUnitsAr.length == (totalDisplayUnits - visibleUnits) && randomIntervalGap <=2){
 							//trace("gap exists");
+							randomAr.push(randomNo);
 						}
 					}
 				}
