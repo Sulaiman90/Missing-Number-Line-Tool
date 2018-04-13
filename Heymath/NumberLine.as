@@ -398,6 +398,7 @@
 		{
 			//trace("createScale:intervalNo " + intervalNo);
 			scaleDraw.generateScale();
+			toolArea.lineMc.visible = true;
 		}
 		
 		function resetScale()
@@ -591,7 +592,9 @@
 			hideMc.mouseChildren = false;
 			hideMc.alpha = 0.6;
 			
-			if (answerMode != "show_all"){
+			trace("hideMode " + hideMode);
+			
+			if (hideMode == "show_all"){
 				answerMc.mouseEnabled = false;
 				answerMc.mouseChildren = false;
 				answerMc.alpha = 0.6;
@@ -611,7 +614,13 @@
 			enableButton(toolArea.create_btn);
 			disableButton(toolArea.reset_btn);
 			
+			scaleDraw.removeAddedChilds();
 			scaleDraw.resetVars();
+			
+			toolArea.lineMc.visible = false;
+			hideMc.mouseEnabled = true;
+			hideMc.mouseChildren = true;
+			hideMc.alpha = 1;
 		}
 		
 		function navigateBtnHandler(e)

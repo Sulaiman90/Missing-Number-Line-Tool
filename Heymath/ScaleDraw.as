@@ -27,6 +27,7 @@
 		function resetVars(){
 			totalRightCnt = 0;
 			totalDisplayUnits = 0;
+			lineCreated = false;
 			
 			resetUnitOptionBtns(1);
 			resetUnitOptionBtns(2);
