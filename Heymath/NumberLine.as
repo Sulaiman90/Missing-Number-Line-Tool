@@ -57,6 +57,9 @@
 		var hideMc;
 		var answerMc;
 		var check_btn;
+		var hideMode;
+		var answerMode;
+		var lineCreated = false;
 		
 		public function NumberLine()
 		{
@@ -79,7 +82,7 @@
 			mainMov.toolArea.visible = false;
 			addEvents();
 			
-			mainMov.intro.visible = false;
+			//mainMov.intro.visible = false;
 			initScale();
 			
 			toolArea.findTxt_txt.addEventListener(KeyboardEvent.KEY_DOWN, handler); 	// testing purpose
@@ -116,11 +119,9 @@
 			
 			scrollTrackUnit = STAGE_WIDTH / (TOTAL_UNITS - 1);
 			
-			createScale(); // testing purpose
-			
-			toolArea.visible = true;
-			
 			toolArea.arrowMc.visible = false;
+			
+			//createScale(); // testing purpose
 		}
 		
 		function findNoBtnHandler(e)
@@ -458,26 +459,38 @@
 				return;
 			}
 			
-			check_btn.visible = false;
+			try{
+				check_btn.visible = false;
+			}
+			catch (Error){
+				
+			}
 			
-			//trace("unitsBtnHandler:btnName " + btnName);
+			trace("unitsBtnHandler:btnName " + btnName);
 					
 			if (btnName == "hide_ran" || btnName == "show_all" || btnName == "hide_all"){
 				resetUnitOptionBtns(1);
-				answerMc.mouseEnabled = true;
-				answerMc.mouseChildren = true;
-				answerMc.alpha = 1;
+				hideMode = btnName;
 			}
 			else if (btnName == "revealAnswer" || btnName == "typeAnswer"){
 				resetUnitOptionBtns(2);
+				answerMode = btnName;
 			}
 			
 			mc.gotoAndStop(2);
+			
+			if (btnName == "show_all"){
+				answerMc.mouseEnabled = false;
+				answerMc.mouseChildren = false;
+				answerMc.alpha = 0.6;
+			}
+			
+			//trace("hideMode " + hideMode);
 		
 			var lineContainerMc = toolArea.lineMc.getChildByName("lineContainer");
 			var unitLineMC;
 			var lineName;
-			if (btnName == "hide_ran"){
+			/*if (btnName == "hide_ran"){
 				answerMc.typeAnswer.gotoAndStop(2);
 				for (var i = 0; i < TOTAL_UNITS; i++){
 					lineName =  "unitLine" + i;
@@ -532,23 +545,27 @@
 				toolArea.answerMc.revealAnswer.gotoAndStop(1);
 				toolArea.answerMc.typeAnswer.gotoAndStop(1);
 			}
-			else if (btnName == "revealAnswer"){
+			else */ if (btnName == "revealAnswer"){
+				trace("in " + hideMode);
 				for (i = 0; i < TOTAL_UNITS; i++){
 					lineName =  "unitLine" + i;
 					unitLineMC = lineContainerMc.getChildByName(lineName);
-					unitLineMC.box.visible = false;
-					unitLineMC.no_txt.visible = true;
 					unitLineMC.no_txt.mouseEnabled = false;
+					unitLineMC.no_txt.text = unitLineMC.val;
 					unitLineMC.tick.visible = false;
-					if (unitLineMC.hide){
-						unitLineMC.no_txt.text = unitLineMC.val;
-						unitLineMC.box.visible = true;
-						if (unitLineMC.tick.currentLabel=="right"){
-							unitLineMC.tick.visible = true;
+					if (hideMode == "hide_ran"){
+						if (unitLineMC.inRandom){
+							unitLineMC.screen.visible = true;
 						}
-						else{
-							unitLineMC.tick.visible = false;
+					}
+					else if (hideMode == "hide_all"){	
+						if (i!=0 && i!=TOTAL_UNITS-1){
+							unitLineMC.screen.visible = true;
 						}
+					}
+					else if (hideMode == "show_all"){	
+						unitLineMC.screen.visible = false;
+						unitLineMC.box.visible = false;
 					}
 				}
 			}
@@ -556,19 +573,38 @@
 				for (i = 0; i < TOTAL_UNITS; i++){
 					lineName =  "unitLine" + i;
 					unitLineMC = lineContainerMc.getChildByName(lineName);
-					unitLineMC.box.visible = false;
-					unitLineMC.no_txt.visible = true;
-					unitLineMC.no_txt.mouseEnabled = false;
-					if (unitLineMC.hide){
-						unitLineMC.no_txt.text = "?";
-						unitLineMC.box.visible = true;
-						if (unitLineMC.tick.currentLabel == "right"){
-							unitLineMC.no_txt.text = unitLineMC.val;
+					unitLineMC.screen.visible = false;
+						
+					if (hideMode == "hide_ran"){
+						if (unitLineMC.inRandom){
+							unitLineMC.box.visible = true;
 							unitLineMC.tick.visible = true;
+							if (unitLineMC.tick.currentLabel != "right"){
+								unitLineMC.no_txt.text = "?";
+								unitLineMC.no_txt.mouseEnabled = true;	
+								unitLineMC.tick.gotoAndStop("none");
+							}
+							else{
+								unitLineMC.no_txt.mouseEnabled = false;	
+							}
 						}
 						else{
-							unitLineMC.tick.visible = false;
-							unitLineMC.no_txt.mouseEnabled = true;
+							unitLineMC.no_txt.text = unitLineMC.val;
+							unitLineMC.no_txt.mouseEnabled = false;
+						}
+					}
+					else if (hideMode == "hide_all"){
+						if (i!=0 && i!=TOTAL_UNITS-1){
+							unitLineMC.box.visible = true;
+							unitLineMC.tick.visible = true;
+							if (unitLineMC.tick.currentLabel != "right"){
+								unitLineMC.no_txt.text = "?";
+								unitLineMC.no_txt.mouseEnabled = true;	
+								unitLineMC.tick.gotoAndStop("none");
+							}
+							else{
+								unitLineMC.no_txt.mouseEnabled = false;	
+							}
 						}
 					}
 				}
@@ -605,6 +641,21 @@
 			toolArea.arrowMc.visible = false;
 			
 			toolArea.findTxt_txt.text = "?";
+			
+			hideMc.mouseEnabled = false;
+			hideMc.mouseChildren = false;
+			hideMc.alpha = 0.6;
+			
+			if (answerMode != "show_all"){
+				answerMc.mouseEnabled = false;
+				answerMc.mouseChildren = false;
+				answerMc.alpha = 0.6;
+			}
+			else{
+				answerMc.mouseEnabled = true;
+				answerMc.mouseChildren = true;
+				answerMc.alpha = 1;
+			}	
 		}
 		
 		function resetBtnHandler(e)
@@ -614,6 +665,8 @@
 			
 			enableButton(toolArea.create_btn);
 			disableButton(toolArea.reset_btn);
+			
+			scaleDraw.resetVars();
 		}
 		
 		function navigateBtnHandler(e)
@@ -624,6 +677,7 @@
 			{
 				mainMov.intro.visible = false;
 				initScale();
+				mainMov.toolArea.visible = true;
 			}
 			else if (name == "home_btn")
 			{

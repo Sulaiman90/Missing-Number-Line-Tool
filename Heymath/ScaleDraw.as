@@ -20,19 +20,33 @@
 		public function initScaleDraw(_rootMain)
 		{
 			//trace("initScaleDraw ");
-			resetVars();
 			initNumberLine(_rootMain, this);
+			resetVars();
 		}
 		
 		function resetVars(){
 			totalRightCnt = 0;
 			totalDisplayUnits = 0;
+			
+			resetUnitOptionBtns(1);
+			resetUnitOptionBtns(2);
+			hideMc.hide_ran.gotoAndStop(2);
+			answerMc.typeAnswer.gotoAndStop(2);
+			
+			hideMode = "hide_ran";
+			answerMode = "typeAnswer";
+			
+			answerMc.mouseEnabled = false;
+			answerMc.mouseChildren = false;
+			answerMc.alpha = 0.6;
 		}
 		
 		public function generateScale()
 		{
 			trace("generateScale ");
-			
+			lineCreated = true;
+			// set movieclip state after creating new scale
+		
 			var startingPointX = SCALE_STARTING_POS_X;
 			var startingPointY = SCALE_STARTING_POS_Y;
 			var scrollSpeedValue;
@@ -117,28 +131,59 @@
 				var scaleUnitPos = startingPointX + SCALE_LEFT_RIGHT_PADDING + (i * unitGapValue);
 				unitLineMC.x = scaleUnitPos;
 				var txtStr = scaleStartingValue + (i * intervalNo);
+				
 				unitLineMC.no_txt.text = txtStr;
 				unitLineMC.val = txtStr;
 				unitLineMC.no_txt.mouseEnabled = false;
-				unitLineMC.hide = false;
+				
+				unitLineMC.inRandom = false;
+				
 				unitLineMC.box.visible = false;
-				unitLineMC.tick.visible = false;
+				unitLineMC.screen.visible = false;
+				unitLineMC.tick.gotoAndStop("none");
+				
 				unitLineMC.box.gotoAndStop(boxFrameNo);
-				//trace("ii " + i,isInArray((i), randomUnitsAr) );
+				unitLineMC.screen.gotoAndStop(boxFrameNo);
+				unitLineMC.screen.addEventListener("click", onScreenClickHandler); 
+				
+				var refTxt = unitLineMC.no_txt;
+				
 				if (isInArray(i, randomUnitsAr)){
-					unitLineMC.no_txt.text = "?";
-					unitLineMC.hide = true;
-					unitLineMC.box.visible = true;
-					unitLineMC.no_txt.mouseEnabled = true;
-					
-					var refTxt = unitLineMC.no_txt;
-					refTxt.maxChars = scaleEndValueLen;
-					refTxt.restrict = "0-9\\-";
-					refTxt.addEventListener("focusIn", focusInNoHandler);
-					refTxt.addEventListener("focusOut", focusOutNoHandler);
-					refTxt.addEventListener("change", changeFn);
-					unitLineMC.tick.visible = true;
-					unitLineMC.tick.gotoAndStop("none");
+					unitLineMC.inRandom = true;
+				}
+				
+				//trace("ii " + i,isInArray((i), randomUnitsAr) );
+				if (hideMode == "hide_ran"){
+					if (unitLineMC.inRandom){
+						unitLineMC.box.visible = true;
+						if (answerMode == "typeAnswer"){
+							unitLineMC.screen.visible = false;
+							refTxt.text = "?";
+							refTxt.mouseEnabled = true;
+							refTxt.maxChars = scaleEndValueLen;
+							refTxt.restrict = "0-9\\-";
+							refTxt.addEventListener("focusIn", focusInNoHandler);
+							refTxt.addEventListener("focusOut", focusOutNoHandler);
+							refTxt.addEventListener("change", changeFn);
+						}
+						else if (answerMode == "revealAnswer"){
+							unitLineMC.screen.visible = true;
+							refTxt.mouseEnabled = false;
+						}
+					}	
+				}
+				else if (hideMode == "hide_all"){
+					if (i!=0 && i!=TOTAL_UNITS-1){
+						unitLineMC.box.visible = true;
+						unitLineMC.screen.visible = false;
+						refTxt.text = "?";
+						refTxt.mouseEnabled = true;
+						refTxt.maxChars = scaleEndValueLen;
+						refTxt.restrict = "0-9\\-";
+						refTxt.addEventListener("focusIn", focusInNoHandler);
+						refTxt.addEventListener("focusOut", focusOutNoHandler);
+						refTxt.addEventListener("change", changeFn);
+					}
 				}
 				//trace("i " + i, txtStr, scaleUnitPos);	
 				
@@ -163,12 +208,6 @@
 			toolArea.txt1.text = scaleStartingValue;
 			toolArea.txt2.text = scaleEndVal;
 			
-			// set movieclip state after creating new scale
-			resetUnitOptionBtns(1);
-			resetUnitOptionBtns(2);
-			hideMc.hide_ran.gotoAndStop(2);
-			answerMc.typeAnswer.gotoAndStop(2);
-			
 			// add a checkbtn to scale
 			check_btn = new checkBtn();
 			lineContainer.addChild(check_btn);
@@ -179,6 +218,10 @@
 			
 		/*trace("createScale:minScaleValue,maxScaleValue " +  (scaleStartingValue+(minDisplayUnits*intervalNo)),
 		   (scaleEndVal - (minDisplayUnits*intervalNo) - 1));*/
+		}
+		
+		function onScreenClickHandler(e){
+			e.currentTarget.visible = false;
 		}
 		
 		function validationCheck(){
@@ -228,6 +271,9 @@
 		}
 		
 		function removeAddedChilds(){
+			if (!lineCreated){
+				return;
+			}
 			var lineContainerMc = toolArea.lineMc.getChildByName("lineContainer");
 			//trace("removeAddedChilds " + lineContainerMc.numChildren);
 			toolArea.lineMc.removeChild(lineContainerMc);
