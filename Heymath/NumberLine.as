@@ -490,62 +490,7 @@
 			var lineContainerMc = toolArea.lineMc.getChildByName("lineContainer");
 			var unitLineMC;
 			var lineName;
-			/*if (btnName == "hide_ran"){
-				answerMc.typeAnswer.gotoAndStop(2);
-				for (var i = 0; i < TOTAL_UNITS; i++){
-					lineName =  "unitLine" + i;
-					unitLineMC = lineContainerMc.getChildByName(lineName);
-					unitLineMC.no_txt.text = unitLineMC.val;
-					unitLineMC.no_txt.visible = true;
-					unitLineMC.box.visible = false;
-					if (unitLineMC.hide){
-						unitLineMC.tick.visible = true;
-						unitLineMC.box.visible = true;
-						if (unitLineMC.tick.currentLabel != "right"){
-							unitLineMC.no_txt.text = "?";
-							unitLineMC.tick.visible = false;
-							unitLineMC.no_txt.mouseEnabled = true;
-						}
-					}
-				}	
-			}
-			else if (btnName == "show_all"){
-				for (i = 0; i < TOTAL_UNITS; i++){
-					lineName =  "unitLine" + i;
-					unitLineMC = lineContainerMc.getChildByName(lineName);
-					unitLineMC.no_txt.text = unitLineMC.val;
-					unitLineMC.no_txt.visible = true;
-					unitLineMC.box.visible = false;
-					unitLineMC.tick.visible = false;
-					unitLineMC.no_txt.mouseEnabled = false;
-					if (unitLineMC.hide){
-						unitLineMC.box.visible = true;
-					}
-				}
-				// disable answer option when show_all is selected
-				answerMc.mouseEnabled = false;
-				answerMc.mouseChildren = false;
-				answerMc.alpha = 0.6;
-				toolArea.answerMc.revealAnswer.gotoAndStop(1);
-				toolArea.answerMc.typeAnswer.gotoAndStop(1);
-			}
-			else if (btnName == "hide_all"){
-				for (i = 0; i < TOTAL_UNITS; i++){
-					if (i!=0 && i!=TOTAL_UNITS-1){
-						lineName =  "unitLine" + i;
-						unitLineMC = lineContainerMc.getChildByName(lineName);
-						unitLineMC.no_txt.visible = false;
-						unitLineMC.box.visible = false;
-						unitLineMC.tick.visible = false;
-					}
-				}
-				answerMc.mouseEnabled = false;
-				answerMc.mouseChildren = false;
-				answerMc.alpha = 0.6;
-				toolArea.answerMc.revealAnswer.gotoAndStop(1);
-				toolArea.answerMc.typeAnswer.gotoAndStop(1);
-			}
-			else */ if (btnName == "revealAnswer"){
+			if (btnName == "revealAnswer"){
 				trace("in " + hideMode);
 				for (i = 0; i < TOTAL_UNITS; i++){
 					lineName =  "unitLine" + i;
