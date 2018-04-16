@@ -7,7 +7,7 @@
 	public class ScaleDraw extends NumberLine
 	{
 		
-		//var slider;
+		var slider;
 		var selectedBox;
 		var totalRightCnt = 0;
 		var totalDisplayUnits = 0;
@@ -58,12 +58,10 @@
 			if (intervalNo < 6){
 				unitGapValue = unitGap[0];
 			}
-			else if (intervalNo > 5 && intervalNo <= MAX_INTERVAL){
+			else{
 				unitGapValue = (intervalNo * 10) + (unitGap[0] - 50); // change according to unitGapValue
 			}
-			else if (intervalNo > MAX_INTERVAL){
-				unitGapValue = unitGap[0];
-			}
+			
 			trace("-------------------------------- ");
 			
 			// total units present in screen
@@ -111,10 +109,8 @@
 			lineShape.name = "line";
 			
 			lineContainer.addChild(lineShape);
-			toolArea.lineMc.setChildIndex(toolArea.lineMc.leftArrow, toolArea.lineMc.numChildren - 1);
-			toolArea.lineMc.setChildIndex(toolArea.lineMc.rightArrow, toolArea.lineMc.numChildren-1);
-			toolArea.lineMc.leftArrow.visible = true;
-			toolArea.lineMc.rightArrow.visible = true;
+			toolArea.lineMc.addChild(toolArea.lineMc.leftArrow);
+			toolArea.lineMc.addChild(toolArea.lineMc.rightArrow);
 			
 			trace(" lineMc width " + toolArea.lineMc.width,toolArea.lineMc.height);
 			
@@ -218,7 +214,7 @@
 						var intervalPos = Math.round(scaleUnitPos + ((unitGapValue / intervalNo) * j));
 						//trace("j " + j,scaleUnitPos,intervalPos);
 						intervalLineMC.x = intervalPos;
-						if (intervalNo > MAX_INTERVAL){
+						if (intervalNo > 15){
 							intervalLineMC.visible = false;
 						}
 					}
@@ -311,9 +307,7 @@
 			var lineContainerMc = toolArea.lineMc.getChildByName("lineContainer");
 			//trace("removeAddedChilds " + lineContainerMc.numChildren);
 			toolArea.lineMc.removeChild(lineContainerMc);
-			toolArea.lineMc.leftArrow.visible = false;
-			toolArea.lineMc.rightArrow.visible = false;
-			//trace("toolArea.lineMc " + toolArea.lineMc.width);
+			trace("toolArea.lineMc " + toolArea.lineMc.width);
 			slider.removeAllEvents();
 		}
 		

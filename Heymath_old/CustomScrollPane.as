@@ -94,8 +94,9 @@
 			//trace("moveContent ");
 			if(sliderState=="mouseMove"){
 				var dy = Math.abs(scrollFaceInitPos - scrollFace.x);
+				//moveVal = (contentWidth-maskWidth)/(scrollTrackWidth-scrollFaceWidth);
 				var posX = Math.round(dy*-1*moveVal+initContentPos);
-				trace("moveContent:scrollFace:X "+scrollFace.x +" posX "+posX);
+				//trace("moveContent:scrollFace:X "+scrollFace.x +" posX "+posX);
 				contentMain.x = posX;
 			}
 			else if(sliderState=="left"){
@@ -117,7 +118,7 @@
 				}
 			}
 			else if (sliderState == "right"){
-				//trace("right scroll:speed "+speed,scrollFace.x,scrollFaceMaxPosX,finalContentPos);
+				trace("right scroll:speed "+speed,scrollFace.x,scrollFaceMaxPosX,finalContentPos);
 				if (contentMain.x - speed > finalContentPos) {
 					trace("if ");
 					if (scrollFace.x >= scrollFaceMaxPosX) {
@@ -130,7 +131,7 @@
 					trace("contentMain "+contentMain.x);
 				} 
 				else {
-					//trace("no more right scroll");
+					trace("no more right scroll");
 					scrollFace.x = scrollFaceMaxPosX;
 					contentMain.x = finalContentPos;
 					stageRef.removeEventListener(Event.ENTER_FRAME,moveContent);
@@ -145,18 +146,9 @@
 				contentMain.x = finalContentPos;
 			}
 		}
-		
-		public function changeContentPos(){
-			trace("changeContentPos ");
-			var dy = Math.abs(scrollFaceInitPos - scrollFace.x);
-			//moveVal = (contentWidth-maskWidth)/(scrollTrackWidth-scrollFaceWidth);
-			var posX = Math.round(dy*-1*moveVal+initContentPos);
-			trace("moveContent:scrollFace:X "+scrollFace.x +" posX "+posX);
-			contentMain.x = posX;
-		}
 
 		function scrollFaceUp(e) {
-			trace("scrollFaceUp "+scrollFace.x,contentMain.x);
+			//trace("scrollFaceUp "+scrollFace.x,contentMain.x);
 			//MovieClip(root).logMsg("scrollFaceUp");
 			currentMov.stopDrag();
 			currentMov.stage.removeEventListener(MouseEvent.MOUSE_UP,scrollFaceUp);
