@@ -39,7 +39,7 @@
 		var unitGap = [70, 100]; // 0th value upto 3 digits & 1st value for more than 3 digits
 		var scrollSpeed = [30, 60];
 		
-		var minDisplayUnitsAr = [6, 4];
+		var minDisplayUnitsAr = [5, 4];
 		var minDisplayUnits = minDisplayUnitsAr[0];
 		
 		var unitGapValue;
@@ -63,6 +63,7 @@
 		var lineCreated = false;
 		
 		var slider;
+		var maxScaleVal;
 		
 		public function NumberLine()
 		{
@@ -136,8 +137,7 @@
 		
 		function findNoBtnHandler(e)
 		{
-			
-			minDisplayUnits = 6;
+
 			// return if no text is entered
 			if (toolArea.findTxt_txt.text == "" || toolArea.findTxt_txt.text == "?"){
 				return;
@@ -187,24 +187,61 @@
 				
 				trace("within scale:intervalVal " + intervalVal + " scaleIntervalNo " + scaleIntervalNo);
 				
-				// move the line scale
-				if (findTxtNo >= minScaleLimit && findTxtNo <= maxScaleLimit){
-					var yy = (scaleIntervalNo-minDisplayUnits+1) * unitGapValue;
-					var xx = 0;
-					trace("findtxt within scale:yy "+yy + " xx "+xx + " xx1 "+(yy-xx));
-					lineScaleX = 0 - (yy-xx);		
-				}
-				else if (findTxtNo >= maxScaleLimit){
-					var xx2 = (((TOTAL_UNITS - minDisplayUnits-1) * unitGapValue) - (minDisplayUnits * 50));
-					trace("findtxt > scale:xx2 "+xx2);
-					lineScaleX = 0 - xx2 - (unitGap[0] - 50);
-				}
-				else if (findTxtNo <= minScaleLimit){
+				maxScaleVal = slider.getFinalContentPos();
+
+				trace("maxScaleVal "+maxScaleVal);
+
+				lineScaleX = 0 - ((scaleIntervalNo * unitGapValue) - 350);
+
+				if(lineScaleX > 0 ){
 					trace("findtxt <= scale");
 					lineScaleX = 0;
+					toolArea.scrollFace.x = SCROLL_FACE_STARTING_POINT;
+					arrowXPos = SCALE_STARTING_POS_X + SCALE_LEFT_RIGHT_PADDING + (scaleIntervalNo * unitGapValue);
 				}
+				else if(lineScaleX < maxScaleVal ){
+					trace("findtxt > scale");
+					lineScaleX = maxScaleVal;
+					moveScrollFace(findTxtNo);
+
+					var intervalDiff = (TOTAL_UNITS - 1 - scaleIntervalNo) ;
+					trace("intervalDiff "+intervalDiff);
+					var val = (STAGE_WIDTH - SCALE_LEFT_RIGHT_PADDING) - (intervalDiff * unitGapValue);
+					trace("val " + val);
+					arrowXPos = val - 1;
+				}
+				else {
+					trace("findtxt within scale");
+					moveScrollFace(findTxtNo);
+					arrowXPos = STAGE_WIDTH / 2;
+				}
+
+				toolArea.arrowMc.x = arrowXPos;
+
+				/*
+				// move the line scale
+				if (findTxtNo >= minScaleLimit && findTxtNo < maxScaleLimit)
+				{
+					trace("findtxt within scale");
+					lineScaleX = 0 - ((scaleIntervalNo * unitGapValue) - 350);
+				}
+				else if (findTxtNo >= maxScaleLimit)
+				{
+					trace("findtxt > scale");
+					lineScaleX = maxScaleVal;
+					//lineScaleX = 0 - (((TOTAL_UNITS-1 - minDisplayUnits) * unitGapValue) - 350);
+					//lineScaleX = 0 - (((TOTAL_UNITS - minDisplayUnits) * unitGapValue) - ((minDisplayUnits+1) * unitGapValue));
+				}
+				else if (findTxtNo <= minScaleLimit)
+				{
+					trace("findtxt <= scale");
+					lineScaleX = 0;
+				} */
+
+				trace("lineScaleX: " + lineScaleX);
 				toolArea.lineMc.x = lineScaleX;
 				
+				/*
 				// move scroll face 	
 				if (intervalVal < 0){
 					intervalVal = 0;
@@ -215,19 +252,18 @@
 				}
 				else{
 					moveScrollFace(findTxtNo);
-				}
+				}*/
 				
-				trace("scrollFace:x " + toolArea.scrollFace.x);
+				trace("lineMc:x " + toolArea.lineMc.x);
 				
 				//slider.changeContentPos();
 				
-				moveArrowMc(scaleIntervalNo);
 				
-				trace("scrollFace:x " + toolArea.scrollFace.x);
+				//trace("scrollFace:x " + toolArea.scrollFace.x);
 				
 				//trace("findTxtNo " + findTxtNo + " arrowXPos " + arrowXPos + " lineScaleX " + lineScaleX);			
 			}
-			else if (findTxtNo > maxScaleLimit){
+			else if (findTxtNo > maxScaleValue){
 				trace(" find value gone after");
 				
 				scaleStartingValue = findTxtNo - (50 * intervalNo);
@@ -236,7 +272,7 @@
 				moveScrollFace(findTxtNo);
 				
 				scaleIntervalNo = Math.abs(findTxtNo - scaleStartingValue) / intervalNo;
-				lineScaleX = 0 - (((scaleIntervalNo-1) * unitGapValue) - (minDisplayUnits * 50)) - (unitGap[0] - 50);
+				lineScaleX = 0 - ((scaleIntervalNo * unitGapValue) - (350));
 				toolArea.lineMc.x = lineScaleX;
 				trace("lineScaleX,scaleIntervalNo " + lineScaleX, scaleIntervalNo,unitGapValue);
 				
@@ -247,20 +283,32 @@
 					arrowXPos = arrowXPos - 50;
 				}
 				toolArea.arrowMc.x = arrowXPos;
-				
+
+				//moveArrowMc(scaleIntervalNo);
+
 				checkScaleValue();
 			}
 			else if (findVal < minScaleValue){
 				// remove the present scale 
 				scaleDraw.removeAddedChilds();
-				
+
+				var newStartingValue = findTxtNo - (50 * intervalNo);
+				scaleStartingValue = newStartingValue;
+				createScale();
+				moveScrollFace(findTxtNo);
+
+				lineScaleX = 0 - ((50 * unitGapValue) - (350));
+				toolArea.lineMc.x = lineScaleX;
+
+				toolArea.arrowMc.x = STAGE_WIDTH / 2;
+				/*
 				// check if the scale should start from zero
 				var val = findTxtNo - scaleStartingValue - (50 * intervalNo);
 				trace("find value gone before:val " + val);
 				if (val > 0){
 					scaleStartingValue = val;
 					createScale();
-					toolArea.lineMc.x = 0 - unitGapValue * (50 - minDisplayUnits) - (unitGap[0] - 50);;
+					toolArea.lineMc.x = 0 - unitGapValue * (50 - minDisplayUnits);
 					moveScrollFace(findTxtNo);
 				}
 				else{
@@ -285,7 +333,7 @@
 						
 						// move line scale
 						scaleIntervalNo = Math.abs(findTxtNo - scaleStartingValue) / intervalNo;
-						lineScaleX = 0 - (((scaleIntervalNo-1) * unitGapValue) - (minDisplayUnits * 50)) - (unitGap[0] - 50);
+						lineScaleX = 0 - ((scaleIntervalNo * unitGapValue) - (minDisplayUnits * 50));
 						trace("scaleIntervalNo " + scaleIntervalNo);
 						if (lineScaleX > 0){
 							lineScaleX = 0;
@@ -300,7 +348,7 @@
 						trace("scaleStartingValue " + scaleStartingValue);
 						createScale();  // 
 						scaleIntervalNo = (findTxtNo - scaleStartingValue) / intervalNo;
-						lineScaleX = 0 - (((scaleIntervalNo-1) * unitGapValue) - (minDisplayUnits * 50)) - (unitGap[0] - 50);
+						lineScaleX = 0 - ((scaleIntervalNo * unitGapValue) - (minDisplayUnits * 50));
 						trace("scaleIntervalNo " + scaleIntervalNo + " lineScaleX "+lineScaleX);		
 						toolArea.lineMc.x = lineScaleX;
 						moveScrollFace(findTxtNo);
@@ -336,8 +384,9 @@
 					toolArea.arrowMc.x = arrowXPos;
 				}
 				checkScaleValue();
+							*/
 			}
-			
+
 			toolArea.startNo_txt.text = scaleStartingValue;
 			if (toolArea.startNo_txt.mouseEnabled){
 				toolArea.startNo_txt.setTextFormat(textBlackColorFormat);
@@ -369,7 +418,7 @@
 			else
 			{
 				sliderXPos = (scaleIntervalNo * scrollTrackUnit) - (toolArea.scrollFace.width / 2);
-				toolArea.scrollFace.x = sliderXPos-1;
+				toolArea.scrollFace.x = sliderXPos;
 			}
 			
 			if (sliderXPos < SCROLL_FACE_STARTING_POINT)
@@ -377,7 +426,7 @@
 				toolArea.scrollFace.x = SCROLL_FACE_STARTING_POINT;
 			}
 			trace("findNoBtnHandler:findNo " + findTxtNo, scaleIntervalNo, sliderXPos, (scaleIntervalNo * scrollTrackUnit) );
-			//toolArea.scrollFace.x = scaleIntervalNo * 6.77;
+			//toolArea.scrollFace.x = 170;
 		}
 		
 		function moveArrowMc(scaleIntervalNo)
@@ -388,25 +437,23 @@
 			trace("findTxtMinLimit " + findTxtMinLimit + " findTxtMaxLimit " + findTxtMaxLimit);
 			
 			// arrow x calculation 	
-			if (scaleIntervalNo >= findTxtMinLimit && (scaleIntervalNo <= findTxtMaxLimit))
-			{
+			if (scaleIntervalNo >= findTxtMinLimit && (scaleIntervalNo < findTxtMaxLimit)){
 				// > && < than findTxtMinLimit,findTxtMaxLimit -- make it as center
 				//trace("moveArrowMc:within scale");
 				arrowXPos = STAGE_WIDTH / 2;
 			}
-			else if (scaleIntervalNo < findTxtMinLimit)
-			{
+			else if (scaleIntervalNo < findTxtMinLimit){
 				// < than findTxtMinLimit, make it as center
 				//trace("moveArrowMc: < min scale limit");
 				arrowXPos = SCALE_STARTING_POS_X + SCALE_LEFT_RIGHT_PADDING + (scaleIntervalNo * unitGapValue);
 			}
-			else if (scaleIntervalNo > findTxtMaxLimit)
-			{
+			else if (scaleIntervalNo >= findTxtMaxLimit){
 				// move arrow 
-				// find the difference between center and findtxt value
-				//trace("moveArrowMc: > max scale limit");
-				var val1 = (STAGE_WIDTH / 2) + ((scaleIntervalNo - (TOTAL_UNITS - minDisplayUnits)) * unitGapValue);
-				//trace("val1 " + val1);
+				// find the difference between center and findtxt value			
+				var diff = (scaleIntervalNo - (TOTAL_UNITS- 1 - minDisplayUnits));
+				trace("moveArrowMc: > max scale limit "+diff);
+				var val1 = (STAGE_WIDTH / 2) + (diff * unitGapValue);
+				trace("val1 " + val1);
 				arrowXPos = val1;
 			}
 			toolArea.arrowMc.x = arrowXPos;
