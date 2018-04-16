@@ -146,15 +146,6 @@
 			}
 		}
 		
-		public function changeContentPos(){
-			//trace("changeContentPos ");
-			var dy = Math.abs(scrollFaceInitPos - scrollFace.x);
-			//moveVal = (contentWidth-maskWidth)/(scrollTrackWidth-scrollFaceWidth);
-			var posX = Math.round(dy*-1*moveVal+initContentPos);
-			//trace("moveContent:scrollFace:X "+scrollFace.x +" posX "+posX);
-			contentMain.x = posX;
-		}
-
 		public function getFinalContentPos(){
 			return finalContentPos;
 		}
