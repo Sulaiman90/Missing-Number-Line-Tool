@@ -107,12 +107,14 @@
 			
 			toolArea.scrollFace.x = SCROLL_FACE_STARTING_POINT;
 			
-			disableButton(toolArea.reset_btn);
 			enableButton(toolArea.create_btn);
+			disableButton(toolArea.reset_btn);
+			disableButton(toolArea.find_btn);
 			
 			enableText(toolArea.startNo_txt);
 			enableText(toolArea.interval_txt);
-			
+			disableText(toolArea.findTxt_txt);
+					
 			enableInputText(toolArea.startNo_txt, 6 , true);
 			enableInputText(toolArea.interval_txt, 2 , false);
 			enableInputText(toolArea.findTxt_txt, 5, true);
@@ -120,6 +122,8 @@
 			scrollTrackUnit = STAGE_WIDTH / (TOTAL_UNITS - 1);
 			
 			toolArea.arrowMc.visible = false;
+			
+			hideSlider(false);
 			
 			//createScale(); // testing purpose
 		}
@@ -424,6 +428,10 @@
 			hideMc.show_all.gotoAndStop(1);
 			hideMc.hide_all.gotoAndStop(1);
 			
+			hideMc.lastSelected = "hide_ran";
+			hideMc.hide_ran.buttonMode = true;
+			hideMc.show_all.buttonMode = true;
+			hideMc.hide_all.buttonMode = true;
 			hideMc.hide_ran.addEventListener("click", unitsBtnHandler);
 			hideMc.show_all.addEventListener("click", unitsBtnHandler);
 			hideMc.hide_all.addEventListener("click", unitsBtnHandler);
@@ -431,6 +439,8 @@
 			answerMc.revealAnswer.gotoAndStop(1);
 			answerMc.typeAnswer.gotoAndStop(1);
 			
+			answerMc.revealAnswer.buttonMode = true;
+			answerMc.typeAnswer.buttonMode = true;
 			answerMc.revealAnswer.addEventListener("click", unitsBtnHandler);
 			answerMc.typeAnswer.addEventListener("click", unitsBtnHandler);
 		}
@@ -484,11 +494,24 @@
 				answerMc.mouseEnabled = false;
 				answerMc.mouseChildren = false;
 				answerMc.alpha = 0.6;
+				disableMc(answerMc);
+				resetUnitOptionBtns(2);
+			}
+			else if (btnName == "hide_ran" || btnName == "hide_all"){
+				enableMc(answerMc);
+				if (hideMc.lastSelected == "show_all"){
+					resetUnitOptionBtns(2);
+					toolArea.answerMc.typeAnswer.gotoAndStop(2);
+				}	
+			}
+			
+			if (btnName == "hide_ran" || btnName == "show_all" || btnName == "hide_all"){
+				hideMc.lastSelected = btnName;
 			}
 			
 			//trace("hideMode " + hideMode);
 		
-			var lineContainerMc = toolArea.lineMc.getChildByName("lineContainer");
+			/*var lineContainerMc = toolArea.lineMc.getChildByName("lineContainer");
 			var unitLineMC;
 			var lineName;
 			if (btnName == "revealAnswer"){
@@ -554,7 +577,7 @@
 						}
 					}
 				}
-			}
+			}*/
 		}
 		
 		function resetUnitOptionBtns(i){
@@ -580,47 +603,43 @@
 			
 			disableText(toolArea.startNo_txt);
 			disableText(toolArea.interval_txt);
+			enableText(toolArea.findTxt_txt);
 			
 			disableButton(toolArea.create_btn);
 			enableButton(toolArea.reset_btn);
+			enableButton(toolArea.find_btn);
 			
 			toolArea.arrowMc.visible = false;
-			
+
 			toolArea.findTxt_txt.text = "?";
 			
-			hideMc.mouseEnabled = false;
-			hideMc.mouseChildren = false;
-			hideMc.alpha = 0.6;
+			disableMc(answerMc);
+			disableMc(hideMc);
+			//trace("hideMode " + hideMode);
 			
-			trace("hideMode " + hideMode);
-			
-			if (hideMode == "show_all"){
-				answerMc.mouseEnabled = false;
-				answerMc.mouseChildren = false;
-				answerMc.alpha = 0.6;
-			}
-			else{
-				answerMc.mouseEnabled = true;
-				answerMc.mouseChildren = true;
-				answerMc.alpha = 1;
-			}	
+			hideSlider(true);
 		}
 		
 		function resetBtnHandler(e)
 		{
 			enableText(toolArea.startNo_txt);
 			enableText(toolArea.interval_txt);
+			disableText(toolArea.findTxt_txt);
 			
 			enableButton(toolArea.create_btn);
 			disableButton(toolArea.reset_btn);
+			disableButton(toolArea.find_btn);
 			
 			scaleDraw.removeAddedChilds();
 			scaleDraw.resetVars();
 			
 			toolArea.lineMc.visible = false;
-			hideMc.mouseEnabled = true;
-			hideMc.mouseChildren = true;
-			hideMc.alpha = 1;
+			toolArea.arrowMc.visible = false;
+			
+			enableMc(answerMc);
+			enableMc(hideMc);
+			
+			hideSlider(false);
 		}
 		
 		function navigateBtnHandler(e)
@@ -637,8 +656,18 @@
 			{
 				toolArea.visible = false;
 				resetScale();
+				scaleDraw.resetVars();
 				mainMov.intro.visible = true;
 			}
+		}
+		
+		function hideSlider(bool){
+			toolArea.scrollFace.visible = bool;
+			toolArea.btnLeft.visible = bool;
+			toolArea.btnRight.visible = bool;
+			toolArea.scrollFace.visible = bool;
+			toolArea.scrollTrack.visible = bool;
+			toolArea.scrollTrackBg.visible = bool;
 		}
 		
 		function onTextChangeHandler(e)
@@ -684,10 +713,10 @@
 				var ar = str.split("");
 				if (ar[0]=="-"){
 					e.currentTarget.maxChars = 6;
-				}else{
-					e.currentTarget.maxChars = 5;
 				}
-				
+				else{
+					e.currentTarget.maxChars = 5;
+				}	
 				tmp = str;
 				e.preventDefault();
 			}
@@ -734,6 +763,18 @@
 			//trace("enableText " + txt.name);
 			txt.mouseEnabled = true;
 			txt.setTextFormat(textBlackColorFormat);
+		}
+		
+		function disableMc(mc){
+			mc.mouseEnabled = false;
+			mc.mouseChildren = false;
+			mc.alpha = 0.6;
+		}
+		
+		function enableMc(mc){
+			mc.mouseEnabled = true;
+			mc.mouseChildren = true;
+			mc.alpha = 1;
 		}
 	
 	}

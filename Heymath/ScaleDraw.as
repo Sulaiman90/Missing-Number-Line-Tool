@@ -36,10 +36,6 @@
 			
 			hideMode = "hide_ran";
 			answerMode = "typeAnswer";
-			
-			answerMc.mouseEnabled = false;
-			answerMc.mouseChildren = false;
-			answerMc.alpha = 0.6;
 		}
 		
 		public function generateScale()
@@ -83,6 +79,10 @@
 			}
 			
 			visibleUnits = parseInt(displayUnits / 3);
+			
+			if (visibleUnits <= 0){
+				visibleUnits = 1;
+			}
 			trace("unitGapValue " + unitGapValue +" displayUnits " + displayUnits  +" visibleUnits " + visibleUnits);
 			
 			scrollSpeedValue = scrollSpeed[0];
@@ -94,7 +94,7 @@
 			toolArea.lineMc.leftArrow.x = startingPointX;
 			toolArea.lineMc.rightArrow.x = scaleEndPos;
 			
-			//trace("startingPoint " + startingPointX, startingPointY, scaleEndPos,);
+			trace("startingPoint " + startingPointX, startingPointY, scaleEndPos);
 			//trace("scaleEndVal " + scaleEndVal);
 			
 			var lineContainer = new MovieClip();
@@ -102,17 +102,24 @@
 			toolArea.lineMc.addChild(lineContainer);
 			
 			var lineShape = new Shape();
+			lineShape.graphics.clear();
 			lineShape.graphics.lineStyle(2, LINE_COLOR, 1);
 			lineShape.graphics.moveTo(startingPointX, startingPointY);
 			lineShape.graphics.lineTo(scaleEndPos, startingPointY);
 			lineShape.name = "line";
 			
 			lineContainer.addChild(lineShape);
-			toolArea.lineMc.addChild(toolArea.lineMc.leftArrow);
-			toolArea.lineMc.addChild(toolArea.lineMc.rightArrow);
+			toolArea.lineMc.setChildIndex(toolArea.lineMc.leftArrow, toolArea.lineMc.numChildren - 1);
+			toolArea.lineMc.setChildIndex(toolArea.lineMc.rightArrow, toolArea.lineMc.numChildren-1);
+			toolArea.lineMc.leftArrow.visible = true;
+			toolArea.lineMc.rightArrow.visible = true;
+			
+			trace(" lineMc width " + toolArea.lineMc.width,toolArea.lineMc.height);
 			
 			// genreate random numbers to hide the units
-			generateRandomNos();
+			if (hideMode != "show_all"){
+				generateRandomNos();
+			}
 			
 			trace(" scaleEndingValue " + scaleEndingValue);
 			var boxFrameNo = 1;
@@ -147,8 +154,12 @@
 				unitLineMC.screen.gotoAndStop(boxFrameNo);
 				unitLineMC.screen.addEventListener("click", onScreenClickHandler); 
 				
+				unitLineMC.attempts = 0;
 				var refTxt = unitLineMC.no_txt;
-				
+				refTxt.removeEventListener("focusIn", focusInNoHandler);
+				refTxt.removeEventListener("focusOut", focusOutNoHandler);
+				refTxt.removeEventListener("change", changeFn);						
+							
 				if (isInArray(i, randomUnitsAr)){
 					unitLineMC.inRandom = true;
 				}
@@ -174,16 +185,22 @@
 					}	
 				}
 				else if (hideMode == "hide_all"){
-					if (i!=0 && i!=TOTAL_UNITS-1){
-						unitLineMC.box.visible = true;
-						unitLineMC.screen.visible = false;
-						refTxt.text = "?";
-						refTxt.mouseEnabled = true;
-						refTxt.maxChars = scaleEndValueLen;
-						refTxt.restrict = "0-9\\-";
-						refTxt.addEventListener("focusIn", focusInNoHandler);
-						refTxt.addEventListener("focusOut", focusOutNoHandler);
-						refTxt.addEventListener("change", changeFn);
+					if (i != 0 && i != TOTAL_UNITS - 1){
+						if (answerMode == "typeAnswer"){
+							unitLineMC.box.visible = true;
+							unitLineMC.screen.visible = false;
+							refTxt.text = "?";
+							refTxt.mouseEnabled = true;
+							refTxt.maxChars = scaleEndValueLen;
+							refTxt.restrict = "0-9\\-";
+							refTxt.addEventListener("focusIn", focusInNoHandler);
+							refTxt.addEventListener("focusOut", focusOutNoHandler);
+							refTxt.addEventListener("change", changeFn);
+						}
+						else if (answerMode == "revealAnswer"){
+							unitLineMC.screen.visible = true;
+							refTxt.mouseEnabled = false;
+						}
 					}
 				}
 				//trace("i " + i, txtStr, scaleUnitPos);	
@@ -199,6 +216,9 @@
 						var intervalPos = Math.round(scaleUnitPos + ((unitGapValue / intervalNo) * j));
 						//trace("j " + j,scaleUnitPos,intervalPos);
 						intervalLineMC.x = intervalPos;
+						if (intervalNo > 15){
+							intervalLineMC.visible = false;
+						}
 					}
 				}
 			}
@@ -222,12 +242,16 @@
 		}
 		
 		function onScreenClickHandler(e){
-			e.currentTarget.visible = false;
+			//e.currentTarget.visible = false;
+			var screen = e.currentTarget;
+			var cf = screen.currentFrame;
+			screen["c" + cf].gotoAndPlay(2);
 		}
 		
 		function validationCheck(){
 			var txtStr = selectedBox.no_txt.text;
 			var ansStr = selectedBox.val;
+			check_btn.visible = false;
 			selectedBox.tick.visible = true;
 			if (txtStr == "" || txtStr == "?"){
 				check_btn.visible = false;
@@ -241,7 +265,14 @@
 				totalRightCnt++;
 			}
 			else if (txtStr != ansStr){
+				selectedBox.attempts++;
 				selectedBox.tick.gotoAndStop("wrong");
+				if (selectedBox.attempts > 3){
+					selectedBox.no_txt.text = ansStr;
+					selectedBox.no_txt.mouseEnabled = false;
+					selectedBox.tick.gotoAndStop("none");
+					check_btn.visible = false;
+				}
 			}
 			if (totalRightCnt > totalDisplayUnits){
 				trace("ALL ANSWERS DONE");
@@ -268,7 +299,7 @@
 				evt.target.text = "?";
 			}
 			selectedBox = evt.currentTarget.parent;
-			validationCheck();
+			//validationCheck();
 		}
 		
 		function removeAddedChilds(){
@@ -278,6 +309,9 @@
 			var lineContainerMc = toolArea.lineMc.getChildByName("lineContainer");
 			//trace("removeAddedChilds " + lineContainerMc.numChildren);
 			toolArea.lineMc.removeChild(lineContainerMc);
+			toolArea.lineMc.leftArrow.visible = false;
+			toolArea.lineMc.rightArrow.visible = false;
+			//trace("toolArea.lineMc " + toolArea.lineMc.width);
 			slider.removeAllEvents();
 		}
 		
@@ -295,15 +329,15 @@
 			//var noOfTimes = (Math.round(100 / displayUnits));
 			var randomIntervalGap = endNo - startNo;
 		
-			trace("totalDisplayUnits " + totalDisplayUnits);
-			trace("startNo " + startNo + " endNo " + endNo);
+			//trace("totalDisplayUnits " + totalDisplayUnits);
+			//trace("startNo " + startNo + " endNo " + endNo);
 			
-			generate();			
+			generate();
 			
 			randomUnitsAr.sort(compareNumbers); 
 			
 			//trace("loopTaken " + loopTaken);
-			trace("generateRandomNos:randomUnitsAr " + randomUnitsAr + " length "+randomUnitsAr.length);
+			//trace("generateRandomNos:randomUnitsAr " + randomUnitsAr + " length "+randomUnitsAr.length);
 				
 			function checkAndRegenerate(){
 				//trace("----------------");
