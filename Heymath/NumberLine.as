@@ -410,6 +410,9 @@
 				hideMc.lastSelected = btnName;
 			}
 			
+			
+			
+			
 			//trace("hideMode " + hideMode);
 		}
 		
@@ -434,11 +437,11 @@
 			scaleDraw.removeAddedChilds();
 			createScale();
 			
-			disableText(toolArea.startNo_txt);
-			disableText(toolArea.interval_txt);
+			//disableText(toolArea.startNo_txt);
+			//disableText(toolArea.interval_txt);
 			enableText(toolArea.findTxt_txt);
 			
-			disableButton(toolArea.create_btn);
+			//disableButton(toolArea.create_btn);
 			enableButton(toolArea.reset_btn);
 			enableButton(toolArea.find_btn);
 			
@@ -446,8 +449,8 @@
 
 			toolArea.findTxt_txt.text = "?";
 			
-			disableMc(answerMc);
-			disableMc(hideMc);
+			//disableMc(answerMc);
+			//disableMc(hideMc);
 			//trace("hideMode " + hideMode);
 			
 			hideSlider(true);
@@ -471,16 +474,15 @@
 			toolArea.lineMc.visible = false;
 			toolArea.arrowMc.visible = false;
 			
-			enableMc(answerMc);
-			enableMc(hideMc);
+			//enableMc(answerMc);
+			//enableMc(hideMc);
 			
 			hideSlider(false);
 		}
 		
-		function navigateBtnHandler(e)
-		{
+		function navigateBtnHandler(e){
 			var name = e.currentTarget.name;
-			trace("navigateBtnHandler:name " + name);
+			//trace("navigateBtnHandler:name " + name);
 			if (name == "explore_btn")
 			{
 				mainMov.intro.visible = false;
@@ -505,8 +507,7 @@
 			toolArea.scrollTrackBg.visible = bool;
 		}
 		
-		function onTextChangeHandler(e)
-		{
+		function onTextChangeHandler(e){
 			if (e.target.text == "")
 			{
 				intervalNo = 1;
@@ -517,8 +518,7 @@
 			}
 		}
 		
-		function enableInputText(_refTxt, _maxChars, _minus)
-		{
+		function enableInputText(_refTxt, _maxChars, _minus){
 			var refTxt = _refTxt;
 			refTxt.maxChars = _maxChars;
 			if (_minus){
